@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#241a4a">
-<meta name="description" content="拼音星球：给小学一二年级孩子的拼音小练习，短时间、低压力、即时反馈。">
+<meta name="description" content="拼音星球：面向 6-12 岁孩子的拼音练习星球，短时间、低压力、即时反馈，错题可以复习。">
 <title>拼音星球 · Pinyin Planet</title>
 <style>
   *,*::before,*::after{box-sizing:border-box;}
@@ -202,6 +202,45 @@
     .bg::before,.doudou{animation:none;}
     .screen.active,.fb.show{animation:none;}
   }
+  /* ===== v2：星球地图 / 年龄筛选 / 徽章 / 声调与拼读 ===== */
+  .chipline{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;}
+  .chip{font-family:inherit;font-size:14px;font-weight:800;color:#fff;background:rgba(255,255,255,.13);
+    border:1px solid rgba(255,255,255,.26);border-radius:999px;padding:9px 15px;min-height:44px;cursor:pointer;transition:background .15s;}
+  .chip[aria-pressed="true"]{background:#ffe08a;color:#4b2f87;border-color:#ffe08a;}
+  .mapgrid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px;}
+  @media (min-width:660px){.mapgrid{grid-template-columns:1fr 1fr;}}
+  .lvl .stack{flex:1 1 auto;min-width:0;}
+  .lvl .starline{display:block;font-size:14px;color:#e8a900;margin-top:3px;letter-spacing:2px;}
+  .lvl .starline .off{color:#d6d0ea;}
+  .lvl .num{font-size:11px;font-weight:800;color:#8b85ad;display:block;margin-top:2px;}
+  .lvl.done{outline:3px solid #a7e8c4;outline-offset:-3px;}
+  .lvl.rec{outline:3px solid #ffd166;outline-offset:-3px;}
+  .g-e{background:#e2dcff;}
+  .g-f{background:#ffe6cc;}
+  .g-g{background:#d9f0ff;}
+  .g-h{background:#e6f7d9;}
+  .badgegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .bgitem{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:10px 12px;}
+  .bgitem .ic{font-size:24px;filter:grayscale(1);opacity:.45;}
+  .bgitem.on{border-color:#ffe08a;background:rgba(255,224,138,.16);}
+  .bgitem.on .ic{filter:none;opacity:1;}
+  .bgitem .tx{min-width:0;}
+  .bgitem .tx b{display:block;font-size:14px;}
+  .bgitem .tx span{display:block;font-size:11px;opacity:.78;line-height:1.4;}
+  .sylbox{display:grid;place-items:center;gap:2px;}
+  .sylbox .hz{font-size:60px;font-weight:800;line-height:1.12;}
+  .sylbox .py{font-size:40px;font-weight:800;letter-spacing:1px;color:#5b4aa8;font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;}
+  .tonechip{display:grid;place-items:center;gap:2px;}
+  .tonechip .syl{font-size:40px;font-weight:800;line-height:1.1;font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;}
+  .tonechip .nm2{font-size:12px;font-weight:800;color:#6b6494;}
+  .blend{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:4px 0;}
+  .blend .pc{min-width:74px;min-height:74px;border-radius:18px;display:grid;place-items:center;font-size:36px;font-weight:800;
+    background:#f7f6ff;border:2px solid #eceafd;color:#332a63;padding:4px 8px;}
+  .blend .pc.p1{background:#ffe9b8;}
+  .blend .pc.p2{background:#cdeffd;}
+  .blend .pl{font-size:28px;font-weight:800;color:#9b93c9;}
+  .opts.four{grid-template-columns:1fr 1fr;}
+
   @media (max-width:360px){
     .wrap{padding:10px 10px 40px;}
     .hanzi{font-size:64px;}
@@ -212,6 +251,11 @@
     .card{padding:13px;border-radius:18px;}
     .btn{font-size:18px;min-height:60px;}
     .brand h1{font-size:19px;}
+    .sylbox .hz{font-size:50px;}
+    .sylbox .py{font-size:32px;}
+    .blend .pc{min-width:62px;min-height:62px;font-size:30px;}
+    .tonechip .syl{font-size:34px;}
+    .lvl .big{width:50px;height:50px;font-size:19px;}
   }
 </style>
 </head>
@@ -222,7 +266,7 @@
   <div class="brand">
     <div>
       <h1>拼音星球</h1>
-      <div class="sub">每天几分钟，练出一小步</div>
+      <div class="sub">6-12 岁拼音练习 · 每天几分钟，练出一小步</div>
     </div>
     <span class="pill" id="pillBeads">拼豆 0</span>
   </div>
@@ -248,36 +292,13 @@
       </div>
     </div>
 
-    <div class="mods">
-      <button class="mod" data-mod="A">
-        <span class="big g-a">b d</span>
-        <div style="flex:1 1 auto;min-width:0">
-          <span class="t">b / d 字母辨认</span>
-          <span class="d">看形状，分清左和右</span>
-        </div>
-      </button>
-      <button class="mod" data-mod="B">
-        <span class="big g-b">p q</span>
-        <div style="flex:1 1 auto;min-width:0">
-          <span class="t">p / q 字母辨认</span>
-          <span class="d">半圆在哪边，竖线往哪伸</span>
-        </div>
-      </button>
-      <button class="mod" data-mod="C">
-        <span class="big g-c">n l</span>
-        <div style="flex:1 1 auto;min-width:0">
-          <span class="t">n / l 声母辨认</span>
-          <span class="d">先听声音，再选声母</span>
-        </div>
-      </button>
-      <button class="mod" data-mod="D">
-        <span class="big g-d">an</span>
-        <div style="flex:1 1 auto;min-width:0">
-          <span class="t">前后鼻音</span>
-          <span class="d">an/ang · en/eng · in/ing</span>
-        </div>
-      </button>
+    <div class="chipline" id="ageChips" role="group" aria-label="选择年龄">
+      <button class="chip" type="button" data-age="0" aria-pressed="true">全部关卡</button>
+      <button class="chip" type="button" data-age="1" aria-pressed="false">6-7 岁</button>
+      <button class="chip" type="button" data-age="2" aria-pressed="false">8-9 岁</button>
+      <button class="chip" type="button" data-age="3" aria-pressed="false">10-12 岁</button>
     </div>
+    <div class="mapgrid" id="mapGrid"></div>
 
     <div class="card soft">
       <div class="row">
@@ -301,6 +322,11 @@
     <div class="grid2">
       <button class="btn sky sm" id="btnGallery">拼豆作品</button>
       <button class="btn ghost sm" id="btnParent">家长记录</button>
+    </div>
+
+    <div class="card soft">
+      <div class="row" style="padding:2px 2px 0"><div class="k">我的徽章</div><span class="mini" id="badgeCount"></span></div>
+      <div class="badgegrid" id="homeBadges"></div>
     </div>
 
     <div class="card soft">
@@ -369,6 +395,33 @@
 
   /* ================= 1. 小工具 ================= */
   var LSKEY = 'pinyin-planet-v1';
+
+  /* 关卡表：名称 / 一句话说明 / 图标大字 / 适合年龄（1=6-7 岁，2=8-9 岁，3=10-12 岁） */
+  var MODIDS = ['A','B','C','D','E','F','G','H'];
+  var MODNAME = {
+    A:'b / d 字母辨认', B:'p / q 字母辨认', C:'n / l 声母辨认', D:'前后鼻音',
+    E:'声母听辨', F:'韵母听辨', G:'声调辨认', H:'音节拼一拼'
+  };
+  var MODSUB = {
+    A:'看形状，分清左和右', B:'半圆在哪边，竖线往哪伸', C:'先听声音，再选声母',
+    D:'an/ang · en/eng · in/ing', E:'b p m f d t n l … 容易混的声母', F:'单韵母和复韵母，听清再选',
+    G:'一声 二声 三声 四声', H:'声母 + 韵母，拼成一个音节'
+  };
+  var MODBIG = { A:'b d', B:'p q', C:'n l', D:'an', E:'b p', F:'a o', G:'ā á', H:'m+ā' };
+  var MODAGE = { A:[1,2], B:[1,2], C:[1,2], D:[2,3], E:[1,2,3], F:[2,3], G:[1,2,3], H:[1,2,3] };
+  var AGELABEL = { 0:'全部关卡', 1:'6-7 岁', 2:'8-9 岁', 3:'10-12 岁' };
+  var TONENAME = { 1:'一声 ā', 2:'二声 á', 3:'三声 ǎ', 4:'四声 à' };
+  var TONEMARK = ['ā','á','ǎ','à'];
+  var TONENUM = ['一声','二声','三声','四声'];
+  var BADGES = [
+    { id:'lvl1',    ic:'🚀', n:'第一次出发', d:'完成第 1 关' },
+    { id:'perfect', ic:'🌟', n:'满分一关',   d:'一关全部答对' },
+    { id:'b50',     ic:'🧩', n:'拼豆 50 颗', d:'累计得到 50 颗拼豆' },
+    { id:'art1',    ic:'🎨', n:'第一幅作品', d:'点亮 1 幅拼豆作品' },
+    { id:'art3',    ic:'🏅', n:'收藏家',     d:'点亮 3 幅拼豆作品' },
+    { id:'q100',    ic:'📚', n:'练满 100 题', d:'累计做题 100 题' },
+    { id:'allart',  ic:'👑', n:'全部点亮',   d:'点亮全部 6 幅作品' }
+  ];
   function $(id){ return document.getElementById(id); }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]; }); }
   function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
@@ -382,34 +435,47 @@
   var storeOK = true;
   function blank(){
     return {
-      v:1, total:0, correct:0, beads:0, levels:0, dRound:0,
-      mods:{ A:{n:0,c:0}, B:{n:0,c:0}, C:{n:0,c:0}, D:{n:0,c:0} },
-      wrong:{}, review:[], settings:{ voice:true, motion:false }
+      v:2, total:0, correct:0, beads:0, levels:0, dRound:0,
+      mods:{ A:{n:0,c:0}, B:{n:0,c:0}, C:{n:0,c:0}, D:{n:0,c:0},
+             E:{n:0,c:0}, F:{n:0,c:0}, G:{n:0,c:0}, H:{n:0,c:0} },
+      stars:{ A:0, B:0, C:0, D:0, E:0, F:0, G:0, H:0 },
+      badges:[], wrong:{}, review:[], settings:{ voice:true, motion:false, age:0 }
     };
   }
   var S = blank();
+  function applySave(p){
+    if(!p || typeof p !== 'object'){ return false; }
+    S.total=num(p.total); S.correct=num(p.correct); S.beads=num(p.beads); S.levels=num(p.levels);
+    S.dRound = (typeof p.dRound==='number' && p.dRound>=0) ? Math.floor(p.dRound) : 0;
+    MODIDS.forEach(function(m){
+      var o = p.mods && p.mods[m];
+      if(o){ S.mods[m] = { n:num(o.n), c:num(o.c) }; }
+      if(p.stars && p.stars[m] != null){ S.stars[m] = Math.min(3, num(p.stars[m])); }
+    });
+    if(Object.prototype.toString.call(p.badges)==='[object Array]'){
+      var bs = [];
+      p.badges.forEach(function(x){ if(typeof x === 'string' && bs.indexOf(x) < 0){ bs.push(x); } });
+      S.badges = bs;
+    }
+    if(p.wrong && typeof p.wrong==='object'){ S.wrong = p.wrong; }
+    if(Object.prototype.toString.call(p.review)==='[object Array]'){
+      S.review = p.review.filter(function(r){ return r && typeof r.m==='string' && typeof r.i==='number' && r.i>=0; });
+    }
+    if(p.settings){
+      S.settings.voice = (p.settings.voice !== false);
+      S.settings.motion = !!p.settings.motion;
+      S.settings.age = Math.min(3, num(p.settings.age));
+    }
+    return true;
+  }
   function load(){
     try{
       var raw = localStorage.getItem(LSKEY);
       if(!raw){ return; }
-      var p = JSON.parse(raw);
-      if(!p || typeof p !== 'object'){ return; }
-      S.total=num(p.total); S.correct=num(p.correct); S.beads=num(p.beads); S.levels=num(p.levels);
-      S.dRound = (typeof p.dRound==='number' && p.dRound>=0) ? Math.floor(p.dRound) : 0;
-      ['A','B','C','D'].forEach(function(m){
-        var o = p.mods && p.mods[m];
-        if(o){ S.mods[m] = { n:num(o.n), c:num(o.c) }; }
-      });
-      if(p.wrong && typeof p.wrong==='object'){ S.wrong = p.wrong; }
-      if(Object.prototype.toString.call(p.review)==='[object Array]'){
-        S.review = p.review.filter(function(r){ return r && typeof r.m==='string' && typeof r.i==='number' && r.i>=0; });
-      }
-      if(p.settings){
-        S.settings.voice = (p.settings.voice !== false);
-        S.settings.motion = !!p.settings.motion;
-      }
+      applySave(JSON.parse(raw));
     }catch(e){ storeOK = false; }
   }
+  function exportText(){ return 'PP2:' + JSON.stringify(S); }
   function save(){
     try{ localStorage.setItem(LSKEY, JSON.stringify(S)); }
     catch(e){ storeOK = false; }
@@ -608,7 +674,7 @@
   function letterSayTip(L){ return (SAY[L] ? L + ' 读作 ' + SAY[L].py + '（' + SAY[L].ch + '）' : ''); }
 
   /* ================= 5. 题库 ================= */
-  var MODNAME = { A:'b / d 字母辨认', B:'p / q 字母辨认', C:'n / l 声母辨认', D:'前后鼻音' };
+  /* 关卡名称等常量已经在第 1 节定义（升级记录格式时要用到） */
   var DP = ['an/ang','en/eng','in/ing'];
   var DPAIR = [['an','ang'],['en','eng'],['in','ing']];
   var CAT = {
@@ -634,6 +700,52 @@
       { g:2, h:'金', p:'jīn',   f:'in'  }, { g:2, h:'京', p:'jīng',  f:'ing' }
     ]
   };
+
+  /* ===== v2 新增题库（汉字、拼音、声调、声母、韵母均已逐条校对） ===== */
+  /* E 声母听辨：i = 正确声母，o = 最容易混的那一个 */
+  var CAT_E = [
+    { h:'爸', p:'bà',  i:'b',  o:'p' },  { h:'兔', p:'tù',  i:'t',  o:'d' },
+    { h:'木', p:'mù',  i:'m',  o:'n' },  { h:'飞', p:'fēi', i:'f',  o:'h' },
+    { h:'狗', p:'gǒu', i:'g',  o:'k' },  { h:'鸡', p:'jī',  i:'j',  o:'q' },
+    { h:'西', p:'xī',  i:'x',  o:'q' },  { h:'知', p:'zhī', i:'zh', o:'z' },
+    { h:'吃', p:'chī', i:'ch', o:'c' },  { h:'十', p:'shí', i:'sh', o:'s' },
+    { h:'热', p:'rè',  i:'r',  o:'l' },  { h:'走', p:'zǒu', i:'z',  o:'zh' },
+    { h:'花', p:'huā', i:'h',  o:'f' },  { h:'口', p:'kǒu', i:'k',  o:'g' },
+    { h:'拿', p:'ná',  i:'n',  o:'l' }
+  ];
+  /* F 韵母听辨：i = 正确韵母，o = 最容易混的那一个 */
+  var CAT_F = [
+    { h:'白', p:'bái', i:'ai', o:'ei' }, { h:'黑', p:'hēi', i:'ei', o:'ai' },
+    { h:'猫', p:'māo', i:'ao', o:'ou' }, { h:'狗', p:'gǒu', i:'ou', o:'ao' },
+    { h:'六', p:'liù', i:'iu', o:'ui' }, { h:'水', p:'shuǐ', i:'ui', o:'iu' },
+    { h:'叶', p:'yè',  i:'ie', o:'üe' }, { h:'月', p:'yuè', i:'üe', o:'ie' },
+    { h:'云', p:'yún', i:'ün', o:'un' }, { h:'轮', p:'lún', i:'un', o:'ün' },
+    { h:'鱼', p:'yú',  i:'ü',  o:'u' },  { h:'五', p:'wǔ',  i:'u',  o:'ü' },
+    { h:'妈', p:'mā',  i:'a',  o:'e' },  { h:'哥', p:'gē',  i:'e',  o:'a' },
+    { h:'衣', p:'yī',  i:'i',  o:'u' }
+  ];
+  /* G 声调辨认：t = 第几声 */
+  var CAT_G = [
+    { h:'妈', p:'mā',   t:1 }, { h:'花', p:'huā',  t:1 }, { h:'天', p:'tiān', t:1 }, { h:'书', p:'shū',  t:1 },
+    { h:'学', p:'xué',  t:2 }, { h:'河', p:'hé',   t:2 }, { h:'云', p:'yún',  t:2 }, { h:'红', p:'hóng', t:2 },
+    { h:'雨', p:'yǔ',   t:3 }, { h:'马', p:'mǎ',   t:3 }, { h:'手', p:'shǒu', t:3 }, { h:'草', p:'cǎo',  t:3 },
+    { h:'大', p:'dà',   t:4 }, { h:'树', p:'shù',  t:4 }, { h:'看', p:'kàn',  t:4 }, { h:'睡', p:'shuì', t:4 }
+  ];
+  /* H 音节拼一拼：i（声母）+ f（韵母）= s（音节），d 是干扰项 */
+  var CAT_H = [
+    { h:'妈', i:'m',  f:'ā',   s:'mā',   d:['nā','mǎ'] },
+    { h:'花', i:'h',  f:'uā',  s:'huā',  d:['hā','huá'] },
+    { h:'爸', i:'b',  f:'à',   s:'bà',   d:['pà','bā'] },
+    { h:'大', i:'d',  f:'à',   s:'dà',   d:['tà','dá'] },
+    { h:'林', i:'l',  f:'ín',  s:'lín',  d:['nín','líng'] },
+    { h:'书', i:'sh', f:'ū',   s:'shū',  d:['sū','shǔ'] },
+    { h:'真', i:'zh', f:'ēn',  s:'zhēn', d:['zēn','zhēng'] },
+    { h:'鸡', i:'j',  f:'ī',   s:'jī',   d:['qī','jǐ'] },
+    { h:'小', i:'x',  f:'iǎo', s:'xiǎo', d:['xiāo','shǎo'] },
+    { h:'牛', i:'n',  f:'iú',  s:'niú',  d:['liú','niǔ'] },
+    { h:'狗', i:'g',  f:'ǒu',  s:'gǒu',  d:['kǒu','gōu'] },
+    { h:'青', i:'q',  f:'īng', s:'qīng', d:['qīn','xīng'] }
+  ];
   var TAILTIP = {
     'an':'an 是前鼻音：舌尖顶住上牙床，声音在嘴巴前面收住。',
     'ang':'ang 是后鼻音：舌根抬起来，声音从鼻子后面出来。',
@@ -641,6 +753,53 @@
     'eng':'eng 是后鼻音：舌根抬起来，声音在鼻子后面。',
     'in':'in 是前鼻音：舌尖顶住上牙床，声音靠前。',
     'ing':'ing 是后鼻音：舌根抬起来，声音在鼻子后面。'
+  };
+  var INITTIP = {
+    b:'b 是双唇音：双唇一闭一开，不送气，读「玻 bō」。',
+    p:'p 和 b 位置一样，但要送出一口气，读「坡 pō」。',
+    m:'m 是鼻音：闭上双唇，气从鼻子出来，读「摸 mō」。',
+    f:'f：上牙轻轻碰下唇，气从窄缝里擦出来，读「佛 fó」。',
+    d:'d：舌尖顶住上牙床，不送气，读「得 dē」。',
+    t:'t 和 d 位置一样，但要送出一口气，读「特 tē」。',
+    n:'n 是鼻音：舌尖顶住上牙床，气从鼻子出来，读「讷 nē」。',
+    l:'l 是边音：舌尖顶住上牙床，气从舌头两边出来，读「勒 lē」。',
+    g:'g：舌根抬起顶住软腭，不送气，读「哥 gē」。',
+    k:'k 和 g 位置一样，但要送气，读「科 kē」。',
+    h:'h：舌根靠近软腭，气从窄缝里出来，读「喝 hē」。',
+    j:'j：舌面贴住硬腭前部，不送气，读「基 jī」。',
+    q:'q 和 j 位置一样，但要送气，读「欺 qī」。',
+    x:'x：舌面靠近硬腭，气轻轻擦出来，读「希 xī」。',
+    zh:'zh：舌尖上翘顶住硬腭前部，不送气，读音像「知 zhī」。',
+    ch:'ch 和 zh 位置一样，但要送气，读音像「吃 chī」。',
+    sh:'sh：舌尖上翘，气从窄缝里擦出来，读音像「诗 shī」。',
+    r:'r：舌尖上翘，声带要振动，读音像「日 rì」。',
+    z:'z：舌尖平着顶住上牙背后，不送气，读音像「资 zī」。',
+    c:'c 和 z 位置一样，但要送气，读音像「雌 cī」。',
+    s:'s：舌尖平着靠近上牙背后，气从窄缝里出来，读音像「思 sī」。'
+  };
+  var FINTIP = {
+    a:'a 是单韵母：嘴巴张大。',
+    o:'o 是单韵母：嘴唇拢成圆圆的一个圈。',
+    e:'e 是单韵母：嘴角往两边拉开，扁扁的。',
+    i:'i 是单韵母：嘴巴扁扁的，上下牙对齐。',
+    u:'u 是单韵母：嘴唇拢成一个小圆孔。',
+    'ü':'ü 是单韵母：嘴唇拢圆只留一个小孔，舌尖抵住下齿背，像「鱼」。',
+    ai:'ai 从 a 滑到 i，一口气连起来。',
+    ei:'ei 从 e 滑到 i。',
+    ao:'ao 从 a 滑到 o，嘴巴由大变小。',
+    ou:'ou 从 o 滑到 u。',
+    iu:'iu 是 i 和 u 连起来，像「优」。',
+    ui:'ui 是 u 和 i 连起来，像「微」。',
+    ie:'ie 是 i 和 e 连起来，像「耶」。',
+    'üe':'üe 是 ü 和 e 连起来，像「月」。',
+    un:'un 是 u 和 n，像「温」。',
+    'ün':'ün 是 ü 和 n，像「晕」。'
+  };
+  var TONETIP = {
+    1:'一声又高又平，像小飞机在天上飞：ā。',
+    2:'二声往上扬，像上坡：á。',
+    3:'三声先降再升，像下坡再上坡：ǎ。',
+    4:'四声一直往下，像下坡：à。'
   };
   function glyphTip(L){
     if(L==='b'){ return 'b 的竖线在左边，半圆在右边。'; }
@@ -662,7 +821,13 @@
     { name:'小星球', rows:['...PP...','..PPPP..','.PPPPPP.','RRPPPPRR','.PPPPPP.','..PPPP..'],
       pal:{ P:'#b7a9ee', R:'#ffd166' } },
     { name:'小星星', rows:['...YY...','..YYYY..','YYYYYYYY','.YYYYYY.','..YYYY..','.YY..YY.'],
-      pal:{ Y:'#ffd166' } }
+      pal:{ Y:'#ffd166' } },
+    { name:'小猫咪', rows:['.CC..CC.','CCCCCCCC','CKCCCCKC','CCCPPCCC','CCCCCCCC','.CCCCCC.'],
+      pal:{ C:'#ffcf8a', K:'#3b3357', P:'#ffb3c1' } },
+    { name:'小房子', rows:['...RR...','..RRRR..','.RRRRRR.','YYYYYYYY','YYWYYBYY','YYWYYBYY'],
+      pal:{ R:'#ff8fa3', Y:'#ffe08a', W:'#9be7ff', B:'#c9a227' } },
+    { name:'小鱼', rows:['..FFFFTT','.FFFFFFT','FFFEFFFT','FFFFFFFT','.FFFFFFT','..FFFFTT'],
+      pal:{ F:'#7fd1f5', T:'#4aa8d8', E:'#2a2350' } }
   ];
   var CELLS = ART.map(function(a){
     var out = [], r, c, ch;
@@ -713,9 +878,22 @@
     }else if(m === 'C'){
       var it = CAT.C[i];
       q.kind = 'sound'; q.h = it.h; q.p = it.p; q.ans = it.i; q.opts = ['n','l'];
-    }else{
+    }else if(m === 'D'){
       var d = CAT.D[i];
       q.kind = 'tail'; q.h = d.h; q.p = d.p; q.ans = d.f; q.g = d.g; q.opts = DPAIR[d.g].slice();
+    }else if(m === 'E'){
+      var e = CAT_E[i];
+      q.kind = 'init'; q.h = e.h; q.p = e.p; q.ans = e.i; q.opts = shuffle([e.i, e.o]);
+    }else if(m === 'F'){
+      var f = CAT_F[i];
+      q.kind = 'fin'; q.h = f.h; q.p = f.p; q.ans = f.i; q.opts = shuffle([f.i, f.o]);
+    }else if(m === 'G'){
+      var g = CAT_G[i];
+      q.kind = 'tone'; q.h = g.h; q.p = g.p; q.ans = String(g.t); q.opts = ['1','2','3','4'];
+    }else{
+      var b = CAT_H[i];
+      q.kind = 'blend'; q.h = b.h; q.init = b.i; q.fin = b.f; q.ans = b.s;
+      q.opts = shuffle([b.s].concat(b.d.slice()));
     }
     return q;
   }
@@ -723,22 +901,41 @@
   function descOf(m, i){
     if(m === 'A' || m === 'B'){ return '字母「' + CAT[m][i] + '」的辨认'; }
     if(m === 'C'){ var it = CAT.C[i]; return it.h + ' ' + it.p + '（声母 ' + it.i + '）'; }
-    var d = CAT.D[i]; return d.h + ' ' + d.p + '（韵母 ' + d.f + '）';
+    if(m === 'D'){ var d = CAT.D[i]; return d.h + ' ' + d.p + '（韵母 ' + d.f + '）'; }
+    if(m === 'E'){ var e = CAT_E[i]; return e.h + ' ' + e.p + '（声母 ' + e.i + '）'; }
+    if(m === 'F'){ var f = CAT_F[i]; return f.h + ' ' + f.p + '（韵母 ' + f.i + '）'; }
+    if(m === 'G'){ var g = CAT_G[i]; return g.h + ' ' + g.p + '（' + TONENAME[g.t] + '）'; }
+    var b = CAT_H[i]; return '拼一拼 ' + b.i + ' + ' + b.f + ' = ' + b.s + '（' + b.h + '）';
   }
   function ansOf(m, i){
     if(m === 'A' || m === 'B'){ return CAT[m][i]; }
     if(m === 'C'){ return CAT.C[i].i; }
-    return CAT.D[i].f;
+    if(m === 'D'){ return CAT.D[i].f; }
+    if(m === 'E'){ return CAT_E[i].i; }
+    if(m === 'F'){ return CAT_F[i].i; }
+    if(m === 'G'){ return TONENAME[CAT_G[i].t]; }
+    return CAT_H[i].s;
   }
   function promptOf(q){
     if(q.kind === 'glyph'){ return '这个字母是哪一个？'; }
     if(q.kind === 'sound'){ return '听一听，这个词的声母是哪一个？'; }
-    return '听一听，这个词的韵母是哪一个？';
+    if(q.kind === 'tail'){ return '听一听，这个词的韵母是哪一个？'; }
+    if(q.kind === 'init'){ return '听一听，这个词的声母是哪一个？'; }
+    if(q.kind === 'fin'){ return '听一听，这个词的韵母是哪一个？'; }
+    if(q.kind === 'tone'){ return '这个字读第几声？看看拼音上的小帽子。'; }
+    return '拼一拼，声母和韵母合起来是哪一个？';
   }
   function sayText(q){ return (q.kind === 'glyph') ? sayLetter(q.glyph) : q.h; }
+  /* 选项提示：告诉孩子这道题在两个什么音之间选 */
+  function optHint(q){
+    if(q.kind === 'sound' || q.kind === 'init'){ return '声母在这两个里面选：' + q.opts[0] + ' / ' + q.opts[1]; }
+    if(q.kind === 'tail' || q.kind === 'fin'){ return '韵母在这两个里面选：' + q.opts[0] + ' / ' + q.opts[1]; }
+    return '';
+  }
 
   /* ================= 8. 出题与关卡 ================= */
   var L = null;
+  function range(n){ var a = [], i; for(i=0;i<n;i++){ a.push(i); } return a; }
   function newQuestions(m, n){
     var out = [], i, k;
     if(m === 'A' || m === 'B'){
@@ -754,12 +951,24 @@
       var nn = [], ll = [];
       ids.forEach(function(x){ if(CAT.C[x].i === 'n'){ nn.push(x); } else { ll.push(x); } });
       shuffle(nn.slice(0,3).concat(ll.slice(0,3))).forEach(function(x){ out.push(makeQ('C', x)); });
-    }else{
+    }else if(m === 'D'){
       var g = S.dRound % 3, a = [], b = [];
       for(i=0;i<CAT.D.length;i++){
         if(CAT.D[i].g === g){ if(CAT.D[i].f === DPAIR[g][0]){ a.push(i); } else { b.push(i); } }
       }
       shuffle(a.slice(0,3).concat(b.slice(0,3))).forEach(function(x){ out.push(makeQ('D', x)); });
+    }else if(m === 'E'){
+      shuffle(range(CAT_E.length)).slice(0, n).forEach(function(x){ out.push(makeQ('E', x)); });
+    }else if(m === 'F'){
+      shuffle(range(CAT_F.length)).slice(0, n).forEach(function(x){ out.push(makeQ('F', x)); });
+    }else if(m === 'G'){
+      var byT = { 1:[], 2:[], 3:[], 4:[] };
+      for(i=0;i<CAT_G.length;i++){ byT[CAT_G[i].t].push(i); }
+      for(i=1;i<=4;i++){ shuffle(byT[i]); }
+      var pick = [byT[1][0], byT[2][0], byT[3][0], byT[4][0], byT[1][1], byT[2][1]];
+      shuffle(pick).forEach(function(x){ out.push(makeQ('G', x)); });
+    }else{
+      shuffle(range(CAT_H.length)).slice(0, n).forEach(function(x){ out.push(makeQ('H', x)); });
     }
     return out;
   }
@@ -785,7 +994,7 @@
     shuffle(qs);
     L = { m:m, qs:qs, idx:0, right:0, gained:0, answered:0, reviewCount:rv.length, counts:{}, marks:[], locked:false };
     for(i=0;i<qs.length;i++){ L.marks.push(''); }
-    $('qTag').textContent = '模块 ' + m + ' · ' + MODNAME[m];
+    $('qTag').textContent = '第 ' + (MODIDS.indexOf(m) + 1) + ' 关 · ' + MODNAME[m];
     show('s-quiz');
     renderQ();
   }
@@ -812,13 +1021,23 @@
     var st = $('qStage');
     if(q.kind === 'glyph'){
       st.innerHTML = '<div class="letterbox">' + svgLetter(q.glyph, 156) + '</div>';
+    }else if(q.kind === 'tone'){
+      st.innerHTML = '<div class="sylbox"><span class="hz">' + esc(q.h) + '</span>'
+        + '<span class="py">' + esc(q.p) + '</span></div>'
+        + '<div class="mini center">看看拼音上方的调号，选一选这是第几声。</div>';
+    }else if(q.kind === 'blend'){
+      st.innerHTML = '<div class="blend">'
+        + '<span class="pc p1">' + esc(q.init) + '</span><span class="pl">+</span>'
+        + '<span class="pc p2">' + esc(q.fin) + '</span><span class="pl">=</span>'
+        + '<span class="pc">?</span></div>'
+        + '<div class="mini center">把声母和韵母连起来读一读，再选出正确的音节。</div>';
     }else{
       st.innerHTML = '<div class="hanzi">' + esc(q.h) + '</div>'
-        + '<div class="mini center">' + (q.kind === 'tail' ? '韵母在这两个里面选：' + esc(q.opts[0]) + ' / ' + esc(q.opts[1]) : '声母在这两个里面选：n / l') + '</div>';
+        + '<div class="mini center">' + esc(optHint(q)) + '</div>';
     }
 
     var au = $('qAudio');
-    if(q.kind === 'glyph'){
+    if(q.kind === 'glyph' || q.kind === 'blend'){
       au.className = 'audiorow one hidden';
       au.innerHTML = '';
     }else if(Speech.ok && S.settings.voice){
@@ -842,9 +1061,18 @@
     }
 
     var opts = $('qOpts'), i, html = '';
-    for(i=0;i<q.opts.length;i++){
-      html += '<button class="opt" type="button" data-v="' + esc(q.opts[i]) + '"><span class="lab' + (q.kind === 'glyph' ? '' : ' wide') + '">' + esc(q.opts[i]) + '</span></button>';
+    if(q.kind === 'tone'){
+      for(i=0;i<4;i++){
+        html += '<button class="opt" type="button" data-v="' + (i+1) + '">'
+          + '<span class="tonechip"><span class="syl">' + TONEMARK[i] + '</span>'
+          + '<span class="nm2">' + TONENUM[i] + '</span></span></button>';
+      }
+    }else{
+      for(i=0;i<q.opts.length;i++){
+        html += '<button class="opt" type="button" data-v="' + esc(q.opts[i]) + '"><span class="lab' + ((q.kind === 'glyph' || q.opts[i].length === 1) ? '' : ' wide') + '">' + esc(q.opts[i]) + '</span></button>';
+      }
     }
+    opts.className = 'opts' + (q.kind === 'tone' ? ' four' : '');
     opts.innerHTML = html;
     var bs = opts.querySelectorAll('.opt');
     for(i=0;i<bs.length;i++){
@@ -857,7 +1085,7 @@
       h += '<div class="head">答对啦！<span class="beadfx">+1 拼豆</span></div>';
     }else{
       h += '<div class="head">再仔细看看这个线索</div>';
-      h += '<div class="mini">你选的是「' + esc(picked) + '」，正确答案是「' + esc(q.ans) + '」。</div>';
+      h += '<div class="mini">你选的是「' + esc(pickLabel(q, picked)) + '」，正确答案是「' + esc(pickLabel(q, q.ans)) + '」。</div>';
     }
     if(q.kind === 'glyph'){
       h += '<div class="reveal">' + esc(q.ans) + '</div>';
@@ -872,14 +1100,26 @@
       h += '<div class="reveal"><b>' + esc(p.charAt(0)) + '</b>' + esc(p.slice(1)) + '</div>';
       h += '<div class="hintline">' + esc(q.h) + ' 的声母是 ' + esc(q.ans) + '。'
         + (q.ans === 'n' ? 'n 是鼻音：舌尖顶住上牙床，气从鼻子出来。' : 'l 是边音：舌尖顶住上牙床，气从舌头两边出来。') + '</div>';
-    }else{
+    }else if(q.kind === 'tail'){
       var py = q.p, cut = py.length - q.ans.length;
       h += '<div class="reveal">' + esc(q.h) + ' <span style="font-size:26px">' + esc(py.slice(0,cut)) + '<b>' + esc(py.slice(cut)) + '</b></span></div>';
       h += '<div class="hintline">' + esc(q.h) + ' ' + esc(py) + ' 的韵母是 ' + esc(q.ans) + '。' + esc(TAILTIP[q.ans] || '') + '</div>';
+    }else if(q.kind === 'init'){
+      h += '<div class="reveal">' + esc(q.h) + ' <span style="font-size:26px">' + esc(q.p) + '</span></div>';
+      h += '<div class="hintline">' + esc(q.h) + ' ' + esc(q.p) + ' 的声母是 <b>' + esc(q.ans) + '</b>。' + esc(INITTIP[q.ans] || '') + '</div>';
+    }else if(q.kind === 'fin'){
+      h += '<div class="reveal">' + esc(q.h) + ' <span style="font-size:26px">' + esc(q.p) + '</span></div>';
+      h += '<div class="hintline">' + esc(q.h) + ' ' + esc(q.p) + ' 的韵母是 <b>' + esc(q.ans) + '</b>。' + esc(FINTIP[q.ans] || '') + '</div>';
+    }else if(q.kind === 'tone'){
+      h += '<div class="reveal">' + esc(q.h) + ' <span style="font-size:26px">' + esc(q.p) + '</span></div>';
+      h += '<div class="hintline">' + esc(q.h) + ' ' + esc(q.p) + ' 是 <b>' + esc(TONENAME[num(q.ans)]) + '</b>。' + esc(TONETIP[num(q.ans)] || '') + '</div>';
+    }else{
+      h += '<div class="reveal">' + esc(q.init) + ' + ' + esc(q.fin) + ' = <b>' + esc(q.ans) + '</b></div>';
+      h += '<div class="hintline">' + esc(q.init) + ' 和 ' + esc(q.fin) + ' 连起来读，就是 <b>' + esc(q.ans) + '</b>，也就是「' + esc(q.h) + '」这个字。</div>';
     }
     if(Speech.ok && S.settings.voice){
       h += '<div class="mt10"><button class="btn sky sm" id="btnPlay2" type="button">'
-        + (q.kind === 'glyph' ? '听一听 ' + esc(q.ans) + ' 的读音' : '再听一次') + '</button></div>';
+        + ((q.kind === 'glyph' || q.kind === 'blend' || q.kind === 'tone') ? '听一听 ' + esc(q.h || q.ans) + ' 的读音' : '再听一次') + '</button></div>';
     }
     if(q.rev){ h += '<div class="mini mt8">这是错题袋里的题，答对了就会把它拿出来。</div>'; }
     fb.className = 'fb show ' + (right ? 'ok' : 'bad');
@@ -948,11 +1188,18 @@
     var qs = L.qs.length, right = L.right, gain = L.gained;
     S.levels++;
     if(L.m === 'D'){ S.dRound = (S.dRound + 1) % 3; }
+    /* 星星：全部答对 3 颗，答对八成以上 2 颗，答对一半以上 1 颗，只记录最好的一次 */
+    var rate = qs ? (right / qs) : 0;
+    var st = (rate >= 1) ? 3 : (rate >= 0.8 ? 2 : (rate >= 0.5 ? 1 : 0));
+    if(st > num(S.stars[L.m])){ S.stars[L.m] = st; }
+    save();
+    var newBadges = checkBadges();
     save();
     var p = beadProgress(), g = artGridHTML(p.ai), wrongCnt = qs - right;
     Sound.play(wrongCnt === 0 ? 'win' : 'tap');
     $('smTitle').textContent = '本关做了 ' + qs + ' 题，答对 ' + right + ' 题';
     var h = '';
+    h += '<div class="mini center" style="font-size:15px">本关评价：<span class="lvl-star">' + starStr(st) + '</span></div>';
     h += '<div class="statgrid">'
       + '<div class="k"><b>' + qs + '</b><span>本关题数</span></div>'
       + '<div class="k"><b>' + right + '</b><span>本关答对</span></div>'
@@ -965,6 +1212,13 @@
     if(L.reviewCount > 0){ h += '<div class="mini">本关里面 ' + L.reviewCount + ' 道是上次的错题。</div>'; }
     h += '<div class="beadwrap"><div class="beadhead"><span class="nm">拼豆作品：' + ART[p.ai].name + '</span><span class="pg">'
       + g.lit + ' / ' + g.need + (g.done ? ' · 已完成' : '') + '</span></div>' + g.html + '</div>';
+    if(newBadges.length){
+      h += '<div class="beadwrap"><div class="beadhead"><span class="nm">获得新徽章</span></div>';
+      newBadges.forEach(function(b){
+        h += '<div class="mixrow" style="background:#fffbe8"><b>' + b.ic + ' ' + esc(b.n) + '</b><br>' + esc(b.d) + '</div>';
+      });
+      h += '</div>';
+    }
     h += '<div class="handtip">该休息啦～ 连续练习眼睛会累。站起来动一动，或者看看窗外吧。</div>';
     $('smBody').innerHTML = h;
     $('pillBeads').textContent = '拼豆 ' + S.beads;
@@ -1000,7 +1254,7 @@
       h += '<div class="sndhint">点一点，听一听「牛」和「流」。</div>';
       h += '<div class="handtip">n 是鼻音：舌尖顶住上牙床，气从鼻子出来。<br>l 是边音：舌尖顶住上牙床，气从舌头两边出来。</div>';
       h += '<div class="mini mt8">先听语音（或者请大人读一遍），再选声母 n 或 l。答题前不会显示拼音，答完才揭晓。一共 6 题。</div>';
-    }else{
+    }else if(m === 'D'){
       h += '<div class="exlist">'
         + '<div class="exrow">'
         + '<button class="ex" type="button" data-say="山"><span class="w">山</span><span class="py">sh<b>an</b><i class="snd">🔊</i></span></button>'
@@ -1018,15 +1272,59 @@
       h += '<div class="sndhint">点一点，听一听每一组前鼻音和后鼻音的区别。</div>';
       h += '<div class="handtip">前鼻音 an / en / in：舌尖顶住上牙床，声音在嘴巴前面收住。<br>后鼻音 ang / eng / ing：舌根抬起来，声音从鼻子后面出来。</div>';
       h += '<div class="mini mt8">先听语音（或者请大人读一遍），再选韵母。这一次会练：<b>' + esc(DP[S.dRound % 3]) + '</b>（三组轮流出现），一共 6 题。</div>';
+    }else if(m === 'E'){
+      h += '<div class="exlist">'
+        + '<button class="ex" type="button" data-say="爸"><span class="w">爸</span><span class="py">bà · 声母 <b>b</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="兔"><span class="w">兔</span><span class="py">tù · 声母 <b>t</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="知"><span class="w">知</span><span class="py">zhī · 声母 <b>zh</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="狗"><span class="w">狗</span><span class="py">gǒu · 声母 <b>g</b><i class="snd">🔊</i></span></button>'
+        + '</div>';
+      h += '<div class="sndhint">点一点字，听一听。答题前不显示拼音，听完再选声母。</div>';
+      h += '<div class="handtip">有些声母只差一口气：b / p、d / t、g / k、j / q、zh / z、ch / c、sh / s，听起来很像，要竖起耳朵。</div>';
+      h += '<div class="mini mt8">先听语音（或者请大人读一遍），再选声母。一共 6 题。</div>';
+    }else if(m === 'F'){
+      h += '<div class="exlist">'
+        + '<button class="ex" type="button" data-say="白"><span class="w">白</span><span class="py">bái · 韵母 <b>ai</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="黑"><span class="w">黑</span><span class="py">hēi · 韵母 <b>ei</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="月"><span class="w">月</span><span class="py">yuè · 韵母 <b>üe</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="轮"><span class="w">轮</span><span class="py">lún · 韵母 <b>un</b><i class="snd">🔊</i></span></button>'
+        + '</div>';
+      h += '<div class="sndhint">点一点字，听一听。答题前不显示拼音。</div>';
+      h += '<div class="handtip">ai / ei、ao / ou、iu / ui、ie / üe、un / ün 听起来很像，要看嘴巴怎么动、声音从哪里收尾。</div>';
+      h += '<div class="mini mt8">先听语音（或者请大人读一遍），再选韵母。一共 6 题。</div>';
+    }else if(m === 'G'){
+      h += '<div class="exlist">'
+        + '<button class="ex" type="button" data-say="妈"><span class="w">妈</span><span class="py">mā · <b>一声</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="河"><span class="w">河</span><span class="py">hé · <b>二声</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="马"><span class="w">马</span><span class="py">mǎ · <b>三声</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="树"><span class="w">树</span><span class="py">shù · <b>四声</b><i class="snd">🔊</i></span></button>'
+        + '</div>';
+      h += '<div class="sndhint">一声平、二声扬、三声拐弯、四声降。</div>';
+      h += '<div class="handtip">一声又高又平（ā），二声往上扬（á），三声先降再升（ǎ），四声一直往下（à）。点一点上面的字，跟着念一念。</div>';
+      h += '<div class="mini mt8">看拼音上面的小帽子（调号），选出这是第几声。一共 6 题。</div>';
+    }else{
+      h += '<div class="exlist">'
+        + '<button class="ex" type="button" data-say="妈"><span class="w">妈</span><span class="py">m + ā = <b>mā</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="花"><span class="w">花</span><span class="py">h + uā = <b>huā</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="书"><span class="w">书</span><span class="py">sh + ū = <b>shū</b><i class="snd">🔊</i></span></button>'
+        + '</div>';
+      h += '<div class="sndhint">声母读得轻又短，韵母读得响又长，连起来就是一个音节。</div>';
+      h += '<div class="handtip">拼读口诀：前音轻短后音重，两音相连猛一碰。比如 m + ā 拼起来就是「妈 mā」。</div>';
+      h += '<div class="mini mt8">把声母和韵母连起来读一读，再选出正确的音节。一共 6 题。</div>';
     }
     return h;
   }
   function openTeach(m){
     Speech.stop();
-    $('teachTag').textContent = '模块 ' + m + ' · ' + MODNAME[m];
+    $('teachTag').textContent = '第 ' + (MODIDS.indexOf(m) + 1) + ' 关 · ' + MODNAME[m];
     $('teachTitle').textContent = (m === 'A') ? '先认识 b 和 d'
       : (m === 'B') ? '先认识 p 和 q'
-      : (m === 'C') ? '先分清 n 和 l' : '先分清前鼻音和后鼻音';
+      : (m === 'C') ? '先分清 n 和 l'
+      : (m === 'D') ? '先分清前鼻音和后鼻音'
+      : (m === 'E') ? '先认出常见的声母'
+      : (m === 'F') ? '先认出常见的韵母'
+      : (m === 'G') ? '先认识四个声调'
+      : '先把声母和韵母拼起来';
     $('teachBody').innerHTML = teachHTML(m);
     var tbs = $('teachBody').querySelectorAll('[data-say]'), i;
     for(i=0;i<tbs.length;i++){
@@ -1037,40 +1335,123 @@
   }
 
   /* ================= 10. 推荐与首页 ================= */
+  /* 已经点亮的拼豆作品数量 */
+  function artDone(){
+    var base = 0, n = 0, i;
+    for(i=0;i<CELLS.length;i++){ base += CELLS[i].length; if(S.beads >= base){ n++; } }
+    return n;
+  }
+  /* 检查有没有新拿到的徽章，返回这一次新拿到的 */
+  function checkBadges(){
+    var got = [], i, m, perfect = false;
+    for(m in S.stars){ if(num(S.stars[m]) >= 3){ perfect = true; } }
+    var done = artDone();
+    var cond = {
+      lvl1: S.levels > 0,
+      perfect: perfect,
+      b50: S.beads >= 50,
+      art1: done >= 1,
+      art3: done >= 3,
+      q100: S.total >= 100,
+      allart: done >= CELLS.length
+    };
+    for(i=0;i<BADGES.length;i++){
+      var b = BADGES[i];
+      if(cond[b.id] && S.badges.indexOf(b.id) < 0){ S.badges.push(b.id); got.push(b); }
+    }
+    return got;
+  }
+  function starStr(n){
+    var s = '', i;
+    for(i=0;i<3;i++){ s += (i < n) ? '★' : '<span style="color:#d6d0ea">★</span>'; }
+    return s;
+  }
+  /* 声调题的选项显示成「一声」这样的说法 */
+  function pickLabel(q, v){
+    if(q && q.kind === 'tone'){ return TONENUM[num(v) - 1] || String(v); }
+    return String(v);
+  }
+  /* 按年龄筛选后要显示哪些关卡 */
+  function activeMods(){
+    var age = num(S.settings.age), out = [];
+    if(!age){ return MODIDS.slice(); }
+    MODIDS.forEach(function(m){ if(MODAGE[m].indexOf(age) >= 0){ out.push(m); } });
+    return out.length ? out : MODIDS.slice();
+  }
+  function renderMap(){
+    var box = $('mapGrid');
+    if(!box){ return; }
+    var rec = recommend(), list = activeMods(), h = '';
+    list.forEach(function(m){
+      var n = num(S.mods[m].n), c = num(S.mods[m].c), st = num(S.stars[m]);
+      var cls = 'mod lvl' + (st > 0 ? ' done' : '') + (m === rec.m ? ' rec' : '');
+      h += '<button class="' + cls + '" type="button" data-mod="' + m + '">'
+        + '<span class="big g-' + m.toLowerCase() + '">' + esc(MODBIG[m]) + '</span>'
+        + '<div class="stack">'
+        + '<span class="t">' + esc(MODNAME[m]) + '</span>'
+        + '<span class="d">' + esc(MODSUB[m]) + '</span>'
+        + '<span class="starline">' + starStr(st) + '</span>'
+        + '<span class="num">已练 ' + n + ' 题 · 最好 ' + c + ' 对' + (m === rec.m ? ' · 今天推荐' : '') + '</span>'
+        + '</div></button>';
+    });
+    box.innerHTML = h;
+    var bs = box.querySelectorAll('.mod'), i;
+    for(i=0;i<bs.length;i++){
+      bs[i].onclick = (function(mm){ return function(){ Sound.play('tap'); openTeach(mm); }; })(bs[i].getAttribute('data-mod'));
+    }
+  }
+  function renderBadgesHTML(){
+    var h = '';
+    BADGES.forEach(function(b){
+      var on = S.badges.indexOf(b.id) >= 0;
+      h += '<div class="bgitem' + (on ? ' on' : '') + '"><span class="ic">' + b.ic + '</span>'
+        + '<span class="tx"><b>' + esc(b.n) + '</b><span>' + esc(b.d) + '</span></span></div>';
+    });
+    return h;
+  }
   function recommend(){
-    var ms = ['A','B','C','D'], sc = { A:0, B:0, C:0, D:0 }, k, cnt, bm, bc, least;
+    var ms = activeMods(), sc = {}, k, cnt, bm, bc, least;
+    ms.forEach(function(m){ sc[m] = 0; });
     for(k in S.wrong){
       var w = S.wrong[k];
       if(w && sc[w.m] != null){ sc[w.m] += num(w.wrong) + num(w.right); }
     }
     var best = null, bv = 0;
     ms.forEach(function(m){ if(sc[m] > bv){ bv = sc[m]; best = m; } });
-    if(best){ return { m:best, why:'这一关孩子遇到的小困难最多，可以先把它练熟。' }; }
+    if(best){ return { m:best, why:'这一关遇到的小困难最多，可以先把它练熟。' }; }
     if(S.review.length > 0){
-      cnt = { A:0, B:0, C:0, D:0 };
+      cnt = {};
+      ms.forEach(function(m){ cnt[m] = 0; });
       S.review.forEach(function(r){ if(cnt[r.m] != null){ cnt[r.m]++; } });
       bm = null; bc = 0;
       ms.forEach(function(m){ if(cnt[m] > bc){ bc = cnt[m]; bm = m; } });
       if(bm){ return { m:bm, why:'错题袋里有 ' + S.review.length + ' 道题，下一关会先复习它们。' }; }
     }
     least = ms[0];
-    ms.forEach(function(m){ if(S.mods[m].n < S.mods[least].n){ least = m; } });
-    if(S.mods[least].n === 0){ return { m:least, why:'这一关还没练过，从它开始最合适。' }; }
-    return { m:'A', why:'四关都练过了，回到最好玩的 b / d 关热热身吧。' };
+    ms.forEach(function(m){ if(num(S.mods[m].n) < num(S.mods[least].n)){ least = m; } });
+    if(num(S.mods[least].n) === 0){ return { m:least, why:'这一关还没练过，从它开始最合适。' }; }
+    return { m:ms[0], why:'这些关卡都练过了，回到第一关热热身也不错。' };
   }
   function sysNoteHTML(){
-    if(!Speech.ok){ return '这台设备的浏览器不能朗读语音。练习照样可以做：模块 C、D 时会提示让大人读一读字词。'; }
-    if(!S.settings.voice){ return '声音和朗读已关闭。模块 C、D 需要大人读一读字词，其他玩法不受影响。'; }
+    if(!Speech.ok){ return '这台设备的浏览器不能朗读语音。练习照样可以做：需要用耳朵听的关卡会提示让大人读一读字词。'; }
+    if(!S.settings.voice){ return '声音和朗读已关闭。需要用耳朵听的关卡可以由大人读一读字词，其他玩法不受影响。'; }
     if(Speech.dead()){ return '刚才这台设备没能发出朗读声，可以请大人读一读字词；答对、答错的提示音不受影响。'; }
     return '语音由浏览器合成，个别字的读音可能不够标准，请以大人的示范为准。';
   }
   function renderHome(){
     $('pillBeads').textContent = '拼豆 ' + S.beads;
     var p = beadProgress(), rec = recommend();
+    if(checkBadges().length){ save(); }
     $('homeRec').innerHTML = '推荐今天练：<b>' + esc(MODNAME[rec.m]) + '</b><br>' + esc(rec.why);
+    renderMap();
+    var bg = $('homeBadges');
+    if(bg){ bg.innerHTML = renderBadgesHTML(); }
+    var bcnt = $('badgeCount');
+    if(bcnt){ bcnt.textContent = '已点亮 ' + S.badges.length + ' / ' + BADGES.length; }
     var bits = [];
     if(S.total > 0){ bits.push('已经练了 ' + S.total + ' 题，答对 ' + S.correct + ' 题。'); }
     bits.push('拼豆 ' + S.beads + ' 颗 · ' + ART[p.ai].name + ' ' + p.lit + ' / ' + p.need);
+    bits.push('拼豆作品已完成 ' + artDone() + ' / ' + ART.length + ' 幅。');
     if(S.review.length > 0){ bits.push('错题袋里有 ' + S.review.length + ' 道题，下次练习会先出现。'); }
     if(!storeOK){ bits.push('本机记录暂时存不下来（可能是浏览器的隐私模式），关掉页面后记录会丢失。'); }
     $('homeStats').innerHTML = bits.join('<br>');
@@ -1091,9 +1472,9 @@
       + '</div>';
     h += '<div class="mini">正确率会随练习内容上下浮动，它不是对孩子的评价，只用来了解最近练了什么。</div>';
 
-    h += '<table class="tbl"><tr><th>练习模块</th><th class="num">做题次数</th><th class="num">答对次数</th></tr>';
-    ['A','B','C','D'].forEach(function(m){
-      h += '<tr><td>' + esc(MODNAME[m]) + '</td><td class="num">' + S.mods[m].n + '</td><td class="num">' + S.mods[m].c + '</td></tr>';
+    h += '<table class="tbl"><tr><th>练习模块</th><th class="num">做题次数</th><th class="num">答对次数</th><th class="num">最好成绩</th></tr>';
+    MODIDS.forEach(function(m){
+      h += '<tr><td>' + esc(MODNAME[m]) + '</td><td class="num">' + S.mods[m].n + '</td><td class="num">' + S.mods[m].c + '</td><td class="num">' + starStr(num(S.stars[m])) + '</td></tr>';
     });
     h += '</table>';
 
@@ -1122,12 +1503,19 @@
     }
     if(S.total === 0){ h += '<div class="mini mt8">还没有练习记录，先让孩子玩一关试试吧。</div>'; }
 
+    h += '<h2 class="h2" style="font-size:18px;margin-top:16px">拼豆与徽章</h2>';
+    h += '<div class="mini">拼豆作品已点亮 ' + artDone() + ' / ' + ART.length + ' 幅，一共 ' + S.beads + ' 颗拼豆；徽章已拿到 ' + S.badges.length + ' / ' + BADGES.length + ' 个。</div>';
+    h += '<div class="badgegrid">' + renderBadgesHTML() + '</div>';
+
+    h += '<h2 class="h2" style="font-size:18px;margin-top:16px">难度范围</h2>';
+    h += '<div class="mini">首页现在选的是「' + esc(AGELABEL[num(S.settings.age)] || AGELABEL[0]) + '」。这个设置只影响显示哪些关卡，随时可以在首页更换。</div>';
+
     h += '<h2 class="h2" style="font-size:18px;margin-top:16px">关于声音</h2>';
     h += '<div class="mini">朗读用的是设备自带的合成语音，不需要联网下载音频。如果一点声音都没有，可以按顺序检查：<br>'
       + '1. iPhone / iPad 侧面的静音键是不是拨到了静音；<br>'
       + '2. 手机、电脑的音量，以及首页的「声音与朗读」开关；<br>'
       + '3. 换用系统自带的 Safari 或 Chrome 打开页面再试一次。<br>'
-      + '真的没有声音也能照常练习：模块 C、D 由大人读一遍字词就好，答对答错还会有提示音。</div>';
+      + '真的没有声音也能照常练习：需要用耳朵听的关卡请大人读一遍字词就好，答对答错还会有提示音。</div>';
 
     h += '<h2 class="h2" style="font-size:18px;margin-top:16px">记录管理</h2>';
     h += '<div class="mini">记录只保存在这台设备的浏览器里，不会上传，也不含任何追踪代码。</div>';
@@ -1149,9 +1537,12 @@
     }
   }
   function clearAll(){
+    var keep = S.settings;
     S = blank();
+    S.settings = keep;
     try{ localStorage.removeItem(LSKEY); }catch(e){}
     save();
+    applySettings();
     renderHome();
     renderParent();
     toast('记录已清空');
@@ -1169,7 +1560,7 @@
     });
     var all = totalNeed();
     h += '<div class="bar" style="margin-top:16px"><i style="width:' + Math.round(clamp(S.beads, 0, all) / all * 100) + '%"></i></div>';
-    h += '<div class="mini mt8">现在有 ' + S.beads + ' 颗拼豆 · 三幅作品全部点亮需要 ' + all + ' 颗。</div>';
+    h += '<div class="mini mt8">现在有 ' + S.beads + ' 颗拼豆 · ' + ART.length + ' 幅作品全部点亮需要 ' + all + ' 颗。答对一题就多一颗拼豆，答错不会扣掉已经点亮的。</div>';
     $('galBody').innerHTML = h;
   }
 
@@ -1178,6 +1569,10 @@
     document.body.classList.toggle('rm', !!S.settings.motion);
     $('swVoice').setAttribute('aria-pressed', S.settings.voice ? 'true' : 'false');
     $('swMotion').setAttribute('aria-pressed', S.settings.motion ? 'true' : 'false');
+    var chips = document.querySelectorAll('#ageChips .chip'), i;
+    for(i=0;i<chips.length;i++){
+      chips[i].setAttribute('aria-pressed', (num(chips[i].getAttribute('data-age')) === num(S.settings.age)) ? 'true' : 'false');
+    }
   }
   function goHome(){
     Speech.stop();
@@ -1186,9 +1581,18 @@
     show('s-home');
   }
   function bind(){
-    var mods = document.querySelectorAll('.mod'), i;
-    for(i=0;i<mods.length;i++){
-      mods[i].onclick = (function(m){ return function(){ openTeach(m); }; })(mods[i].getAttribute('data-mod'));
+    var i;
+    /* 首页的关卡卡片由 renderMap() 生成，点击事件在那里绑定 */
+    var chips = document.querySelectorAll('#ageChips .chip');
+    for(i=0;i<chips.length;i++){
+      chips[i].onclick = function(){
+        S.settings.age = num(this.getAttribute('data-age'));
+        Sound.play('tap');
+        save();
+        applySettings();
+        renderHome();
+        toast(this.getAttribute('data-age') === '0' ? '显示全部关卡' : ('只看 ' + AGELABEL[num(this.getAttribute('data-age'))]));
+      };
     }
     var homeBtns = document.querySelectorAll('[data-home]');
     for(i=0;i<homeBtns.length;i++){ homeBtns[i].onclick = goHome; }
