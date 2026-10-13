@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#241a4a">
+<meta name="description" content="拼音星球：给小学一二年级孩子的拼音小练习，短时间、低压力、即时反馈。">
+<title>拼音星球 · Pinyin Planet</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,-apple-system,sans-serif;
+    background:#150c2b;color:#fff;min-height:100vh;overflow-x:hidden;
+    -webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;
+    font-size:16px;line-height:1.55;
+  }
+  .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(120% 78% at 50% -6%,#553a95 0%,#37245f 38%,#20143d 68%,#150c2b 100%);}
+  .bg::before{content:"";position:absolute;inset:0;opacity:.65;
+    background-image:
+      radial-gradient(2px 2px at 18px 26px,rgba(255,255,255,.6) 50%,transparent 52%),
+      radial-gradient(1.5px 1.5px at 118px 86px,rgba(255,255,255,.45) 50%,transparent 52%),
+      radial-gradient(2.4px 2.4px at 205px 34px,rgba(255,255,255,.35) 50%,transparent 52%),
+      radial-gradient(1.6px 1.6px at 74px 168px,rgba(255,255,255,.5) 50%,transparent 52%),
+      radial-gradient(2px 2px at 168px 198px,rgba(255,255,255,.3) 50%,transparent 52%);
+    background-size:250px 230px;background-repeat:repeat;
+    animation:twinkle 7s ease-in-out infinite alternate;}
+  .bg::after{content:"";position:absolute;left:-14%;bottom:-16%;width:76%;height:50%;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(155,231,196,.18),transparent 72%);}
+  @keyframes twinkle{from{opacity:.4}to{opacity:.85}}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes pop{0%{transform:scale(.95)}60%{transform:scale(1.02)}100%{transform:scale(1)}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @keyframes floatUp{0%{opacity:0;transform:translateY(6px)}25%{opacity:1}100%{opacity:0;transform:translateY(-20px)}}
+  .wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding:12px 14px 46px;}
+  .screen{display:none;}
+  .screen.active{display:block;animation:rise .26s ease-out;}
+  .hidden{display:none !important;}
+  .center{text-align:center;}
+  .mt8{margin-top:8px;}
+  .mt10{margin-top:10px;}
+  .mt14{margin-top:14px;}
+
+  .brand{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 2px 14px;}
+  .brand h1{margin:0;font-size:21px;letter-spacing:.4px;line-height:1.2;}
+  .brand .sub{font-size:12px;opacity:.72;margin-top:2px;}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);
+    color:#fff;border-radius:999px;padding:7px 13px;font-size:14px;font-weight:700;white-space:nowrap;}
+
+  .card{background:#fff;color:#2a2350;border-radius:22px;padding:16px;box-shadow:0 14px 28px rgba(8,3,26,.3);margin-bottom:14px;}
+  .card.soft{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.17);box-shadow:none;}
+  .card .h2{margin:6px 0 10px;font-size:22px;line-height:1.3;}
+  .tag{display:inline-block;background:#f0edff;color:#5b4aa8;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:800;letter-spacing:.5px;}
+  .card.soft .tag{background:rgba(255,255,255,.18);color:#fff;}
+  .mini{font-size:13px;color:#6b6494;line-height:1.6;}
+  .card.soft .mini{color:rgba(255,255,255,.78);}
+  p{margin:8px 0;}
+
+  .hero{display:flex;align-items:center;gap:14px;}
+  .doudou{flex:0 0 auto;width:96px;height:96px;animation:bob 3.2s ease-in-out infinite;}
+  .heroText{min-width:0;}
+  .bubble{position:relative;background:#f5f3ff;border-radius:16px;padding:10px 14px;font-size:16px;font-weight:700;line-height:1.45;}
+  .heroSub{font-size:13px;color:#6b6494;margin-top:8px;line-height:1.5;}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:64px;border:0;border-radius:18px;
+    font-family:inherit;font-size:20px;font-weight:800;color:#2a2350;background:#fff;padding:12px 16px;text-align:center;
+    box-shadow:0 6px 0 rgba(0,0,0,.14);cursor:pointer;transition:transform .12s,box-shadow .12s,filter .12s;}
+  .btn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(0,0,0,.14);}
+  .btn.primary{background:linear-gradient(180deg,#ffe08a,#ffb703);}
+  .btn.mint{background:linear-gradient(180deg,#c3f4dd,#7fd8ae);}
+  .btn.sky{background:linear-gradient(180deg,#d3f1ff,#95dbf7);}
+  .btn.pink{background:linear-gradient(180deg,#ffc9d4,#ff90a3);}
+  .btn.ghost{background:rgba(255,255,255,.13);color:#fff;border:1px solid rgba(255,255,255,.26);box-shadow:none;}
+  .btn.ghost.dark{background:#f3f1fc;color:#4a3f7a;border:1px solid #e0daf5;box-shadow:none;}
+  .btn.sm{min-height:52px;font-size:16px;border-radius:16px;padding:8px 12px;}
+  .btn:disabled{filter:grayscale(.35);opacity:.75;cursor:default;}
+
+  .mods{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px;}
+  @media (min-width:660px){.mods{grid-template-columns:1fr 1fr;}}
+  .mod{display:flex;align-items:center;gap:12px;min-height:80px;border:0;border-radius:20px;padding:12px 14px;text-align:left;
+    font-family:inherit;color:#2a2350;background:#fff;box-shadow:0 8px 0 rgba(0,0,0,.14);cursor:pointer;transition:transform .12s;}
+  .mod:active{transform:translateY(3px);}
+  .mod .big{flex:0 0 auto;width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:22px;font-weight:800;letter-spacing:1px;}
+  .g-a{background:#ffe9b8;}
+  .g-b{background:#cdeffd;}
+  .g-c{background:#ffdfe6;}
+  .g-d{background:#d7f7e5;}
+  .mod .t{display:block;font-size:18px;font-weight:800;line-height:1.3;}
+  .mod .d{display:block;font-size:13px;color:#6b6494;margin-top:2px;}
+  .mod .badge{display:inline-block;font-size:11px;font-weight:800;color:#8a6d00;background:#ffe9b8;border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:2px;}
+
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 2px;}
+  .row + .row{border-top:1px solid rgba(255,255,255,.14);}
+  .row .k{font-size:15px;font-weight:800;}
+  .sw{position:relative;flex:0 0 auto;width:66px;height:44px;min-width:44px;min-height:44px;border-radius:999px;border:0;background:#cfc9e6;cursor:pointer;transition:background .18s;}
+  .sw::after{content:"";position:absolute;top:5px;left:5px;width:34px;height:34px;border-radius:50%;background:#fff;transition:left .18s;box-shadow:0 2px 4px rgba(0,0,0,.22);}
+  .sw[aria-pressed="true"]{background:#7fd8ae;}
+  .sw[aria-pressed="true"]::after{left:27px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  @media (max-width:359px){.grid2 .btn.sm{font-size:13px;min-height:56px;}}
+
+  .letterbox{display:grid;place-items:center;padding:2px 0 6px;}
+  .glyphrow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px;}
+  .cc{display:block;width:100%;font-family:inherit;color:inherit;text-align:center;background:#f7f6ff;border-radius:18px;
+    padding:12px 8px;border:2px solid #eceafd;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.08);transition:transform .12s,box-shadow .12s;}
+  .cc:active{transform:translateY(2px);box-shadow:none;}
+  .cc .ccglyph{display:grid;place-items:center;height:132px;}
+  .cc .ccname{display:block;font-size:34px;font-weight:800;line-height:1.1;color:#332a63;font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;}
+  .cc .cchint{display:block;font-size:13px;color:#6b6494;margin-top:6px;line-height:1.5;}
+  .cc .ccsay{display:block;font-size:12px;font-weight:800;color:#8b85ad;margin-top:6px;}
+  .snd{font-style:normal;font-size:14px;margin-left:4px;}
+  .sndhint{font-size:13px;font-weight:800;color:#5b4aa8;text-align:center;margin-top:10px;line-height:1.5;}
+  .handtip{background:#fff8e6;border:2px solid #ffe3a3;border-radius:16px;padding:12px 14px;font-size:14px;color:#7a5b00;margin-top:12px;line-height:1.6;}
+  .exlist{display:grid;gap:8px;margin-top:10px;}
+  .exrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .ex{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;width:100%;font-family:inherit;color:inherit;
+    text-align:left;background:#f7f6ff;border:2px solid #eceafd;border-radius:14px;padding:10px 12px;cursor:pointer;
+    box-shadow:0 3px 0 rgba(0,0,0,.07);transition:transform .12s,box-shadow .12s;}
+  .ex:active{transform:translateY(2px);box-shadow:none;}
+  .ex .w{font-size:22px;font-weight:800;}
+  .ex .py{font-size:17px;font-weight:700;color:#6b6494;}
+  .ex .py b{color:#e8590c;}
+
+  .qhead{display:flex;align-items:center;gap:10px;margin:2px 2px 10px;}
+  .iconbtn{flex:0 0 auto;width:46px;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.13);color:#fff;
+    font-size:18px;font-weight:800;font-family:inherit;cursor:pointer;}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;flex:1 1 auto;}
+  .dots i{display:block;width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.28);}
+  .dots i.ok{background:#7fd8ae;}
+  .dots i.bad{background:#ff90a3;}
+  .dots i.now{outline:2px solid #fff;outline-offset:2px;}
+
+  .qprompt{font-size:18px;font-weight:800;margin:10px 0 4px;line-height:1.4;}
+  .qstage{display:grid;place-items:center;gap:6px;padding:6px 0 2px;}
+  .hanzi{font-size:82px;font-weight:800;line-height:1.12;letter-spacing:3px;}
+  .audiorow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .audiorow.one{grid-template-columns:1fr;}
+  .warnline{grid-column:1 / -1;font-size:13px;line-height:1.6;color:#7a5b00;background:#fff8e6;border:2px solid #ffe3a3;border-radius:14px;padding:10px 12px;}
+
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  .opts.one{grid-template-columns:1fr;}
+  .opt{min-height:96px;border-radius:20px;border:3px solid #eceafd;background:#fff;color:#2a2350;font-family:inherit;
+    display:grid;place-items:center;padding:10px;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.1);transition:transform .12s,background .15s;}
+  .opt:active{transform:translateY(2px);}
+  .opt .lab{font-size:56px;font-weight:800;line-height:1.05;font-family:"Segoe UI","Helvetica Neue",Arial,"Microsoft YaHei",sans-serif;}
+  .opt .lab.wide{font-size:42px;letter-spacing:1px;}
+  .opt.right{border-color:#37c871;background:#eafff3;}
+  .opt.right .lab{color:#157a44;}
+  .opt.wrong{border-color:#fb7185;background:#ffeff3;}
+  .opt.wrong .lab{color:#b3324a;}
+  .opt:disabled{cursor:default;}
+
+  .fb{margin-top:14px;border-radius:18px;padding:14px;font-size:15px;line-height:1.6;display:none;}
+  .fb.show{display:block;animation:pop .22s ease-out;}
+  .fb.ok{background:#eafff3;border:2px solid #a7e8c4;color:#14653d;}
+  .fb.bad{background:#fff4f6;border:2px solid #ffc2cd;color:#9c2941;}
+  .fb .head{font-size:19px;font-weight:800;margin-bottom:6px;}
+  .fb .reveal{font-size:34px;font-weight:800;line-height:1.25;margin:4px 0 6px;letter-spacing:1px;}
+  .fb .reveal b{color:#e8590c;}
+  .fb .mini{color:inherit;opacity:.85;}
+  .fb .hintline{margin-top:8px;background:rgba(255,255,255,.72);border-radius:12px;padding:8px 10px;font-size:14px;}
+  .beadfx{display:inline-block;font-weight:800;color:#b06a00;text-shadow:0 1px 0 #fff,0 0 6px rgba(255,255,255,.9);animation:floatUp 1.1s ease-out forwards;}
+
+  .statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 4px;}
+  .statgrid .k{background:#f5f3ff;border-radius:16px;padding:12px 8px;text-align:center;}
+  .statgrid .k b{display:block;font-size:26px;color:#4b2f87;line-height:1.2;}
+  .statgrid .k span{font-size:12px;color:#6b6494;}
+  .tbl{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px;}
+  .tbl th,.tbl td{padding:9px 6px;border-bottom:1px solid #efedfa;text-align:left;}
+  .tbl th{font-size:12px;color:#6b6494;font-weight:700;}
+  .tbl td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .mixrow{background:#fff8e6;border-radius:14px;padding:10px 12px;margin-top:8px;font-size:14px;line-height:1.55;}
+  .mixrow b{color:#b3324a;}
+  .confirm{background:#fff4f6;border:2px solid #ffc2cd;border-radius:16px;padding:12px;margin-top:10px;}
+  .confirm .mini{color:#9c2941;}
+
+  .beadwrap{margin-top:12px;}
+  .beadhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+  .beadhead .nm{font-size:17px;font-weight:800;}
+  .beadhead .pg{font-size:13px;color:#6b6494;font-variant-numeric:tabular-nums;}
+  .beadgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;background:#f2effc;border-radius:16px;padding:8px;}
+  .beadgrid span{display:block;aspect-ratio:1/1;border-radius:4px;background:#e2ddf4;}
+  .beadgrid span.void{background:transparent;}
+  .bar{height:10px;border-radius:999px;background:#eceafd;overflow:hidden;margin-top:8px;}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,#9be7c4,#7fd8ae);width:0;}
+  .done{font-size:12px;font-weight:800;color:#157a44;background:#eafff3;border-radius:999px;padding:2px 10px;}
+
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#fff;color:#2a2350;padding:11px 18px;border-radius:999px;
+    font-size:14px;font-weight:700;box-shadow:0 10px 24px rgba(8,3,26,.35);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+    max-width:calc(100% - 32px);text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+  body.rm .bg::before{animation:none;}
+  body.rm .doudou{animation:none;}
+  body.rm .screen.active{animation:none;}
+  body.rm .fb.show{animation:none;}
+  body.rm .beadfx{animation:none;}
+  body.rm *{transition:none !important;}
+  @media (prefers-reduced-motion: reduce){
+    .bg::before,.doudou{animation:none;}
+    .screen.active,.fb.show{animation:none;}
+  }
+  @media (max-width:360px){
+    .wrap{padding:10px 10px 40px;}
+    .hanzi{font-size:64px;}
+    .opt{min-height:88px;}
+    .opt .lab{font-size:48px;}
+    .opt .lab.wide{font-size:34px;}
+    .cc .ccglyph{height:108px;}
+    .card{padding:13px;border-radius:18px;}
+    .btn{font-size:18px;min-height:60px;}
+    .brand h1{font-size:19px;}
+  }
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+<div class="wrap">
+
+  <div class="brand">
+    <div>
+      <h1>拼音星球</h1>
+      <div class="sub">每天几分钟，练出一小步</div>
+    </div>
+    <span class="pill" id="pillBeads">拼豆 0</span>
+  </div>
+
+  <!-- ===================== 首页 ===================== -->
+  <section class="screen active" id="s-home">
+    <div class="card hero">
+      <svg class="doudou" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+        <path d="M50 30 C49 20 54 13 63 11" stroke="#6bc39a" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <ellipse cx="66" cy="12" rx="8" ry="6" fill="#83dcb4" transform="rotate(-18 66 12)"/>
+        <ellipse cx="50" cy="60" rx="32" ry="30" fill="#9be7c4" stroke="#6bc39a" stroke-width="3"/>
+        <ellipse cx="38" cy="54" rx="5.5" ry="6.5" fill="#2a2350"/>
+        <ellipse cx="62" cy="54" rx="5.5" ry="6.5" fill="#2a2350"/>
+        <ellipse cx="36.4" cy="51.6" rx="2" ry="2.2" fill="#ffffff"/>
+        <ellipse cx="60.4" cy="51.6" rx="2" ry="2.2" fill="#ffffff"/>
+        <ellipse cx="26" cy="68" rx="6" ry="4" fill="#ffb3c1" opacity=".9"/>
+        <ellipse cx="74" cy="68" rx="6" ry="4" fill="#ffb3c1" opacity=".9"/>
+        <path d="M44 70 Q50 76 56 70" stroke="#2a2350" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="heroText">
+        <div class="bubble" id="homeBubble">嗨，我是豆豆。今天想练哪一关？</div>
+        <div class="heroSub" id="homeRec"></div>
+      </div>
+    </div>
+
+    <div class="mods">
+      <button class="mod" data-mod="A">
+        <span class="big g-a">b d</span>
+        <div style="flex:1 1 auto;min-width:0">
+          <span class="t">b / d 字母辨认</span>
+          <span class="d">看形状，分清左和右</span>
+        </div>
+      </button>
+      <button class="mod" data-mod="B">
+        <span class="big g-b">p q</span>
+        <div style="flex:1 1 auto;min-width:0">
+          <span class="t">p / q 字母辨认</span>
+          <span class="d">半圆在哪边，竖线往哪伸</span>
+        </div>
+      </button>
+      <button class="mod" data-mod="C">
+        <span class="big g-c">n l</span>
+        <div style="flex:1 1 auto;min-width:0">
+          <span class="t">n / l 声母辨认</span>
+          <span class="d">先听声音，再选声母</span>
+        </div>
+      </button>
+      <button class="mod" data-mod="D">
+        <span class="big g-d">an</span>
+        <div style="flex:1 1 auto;min-width:0">
+          <span class="t">前后鼻音</span>
+          <span class="d">an/ang · en/eng · in/ing</span>
+        </div>
+      </button>
+    </div>
+
+    <div class="card soft">
+      <div class="row">
+        <div>
+          <div class="k">声音与朗读</div>
+          <div class="mini">朗读题目里的字词，也播放答对、答错的提示音（合成语音仅供参考）</div>
+        </div>
+        <button class="sw" id="swVoice" aria-pressed="true" aria-label="声音与朗读开关"></button>
+      </div>
+      <div class="row">
+        <div>
+          <div class="k">减少动画</div>
+          <div class="mini">画面更安静，适合容易分心的时候</div>
+        </div>
+        <button class="sw" id="swMotion" aria-pressed="false" aria-label="减少动画开关"></button>
+      </div>
+      <button class="btn ghost dark sm mt10" id="btnTestVoice" type="button">试一试有没有声音</button>
+      <div class="mini mt10" id="sysNote"></div>
+    </div>
+
+    <div class="grid2">
+      <button class="btn sky sm" id="btnGallery">拼豆作品</button>
+      <button class="btn ghost sm" id="btnParent">家长记录</button>
+    </div>
+
+    <div class="card soft">
+      <div class="mini" id="homeStats"></div>
+    </div>
+  </section>
+
+  <!-- ===================== 教学页 ===================== -->
+  <section class="screen" id="s-teach">
+    <div class="card">
+      <span class="tag" id="teachTag">模块 A</span>
+      <h2 class="h2" id="teachTitle"></h2>
+      <div id="teachBody"></div>
+    </div>
+    <button class="btn primary" id="btnTeachStart">开始练习（6 题）</button>
+    <button class="btn ghost sm mt10" data-home>返回首页</button>
+  </section>
+
+  <!-- ===================== 答题页 ===================== -->
+  <section class="screen" id="s-quiz">
+    <div class="qhead">
+      <button class="iconbtn" id="btnQuit" aria-label="退出本关，回到首页">✕</button>
+      <div class="dots" id="qDots"></div>
+      <span class="pill" id="qBeads">拼豆 0</span>
+    </div>
+    <div class="card">
+      <span class="tag" id="qTag">模块 A</span>
+      <div class="qprompt" id="qPrompt"></div>
+      <div class="qstage" id="qStage"></div>
+      <div class="audiorow one hidden" id="qAudio"></div>
+      <div class="opts" id="qOpts"></div>
+      <div class="fb" id="qFb" role="status" aria-live="polite"></div>
+    </div>
+    <button class="btn primary hidden" id="btnNext">下一题</button>
+    <div class="mini center mt8">答错不扣分，错题之后还会再出现</div>
+  </section>
+
+  <!-- ===================== 小结页 ===================== -->
+  <section class="screen" id="s-summary">
+    <div class="card">
+      <span class="tag">本关结束</span>
+      <h2 class="h2" id="smTitle"></h2>
+      <div id="smBody"></div>
+    </div>
+    <button class="btn primary" id="btnSmHome">休息一下，回到首页</button>
+    <button class="btn ghost sm mt10" id="btnSmAgain">再练一关</button>
+  </section>
+
+  <!-- ===================== 家长记录页 ===================== -->
+  <section class="screen" id="s-parent">
+    <div class="card" id="pnBody"></div>
+    <button class="btn ghost sm" data-home>返回首页</button>
+  </section>
+
+  <!-- ===================== 拼豆作品页 ===================== -->
+  <section class="screen" id="s-gallery">
+    <div class="card" id="galBody"></div>
+    <button class="btn ghost sm" data-home>返回首页</button>
+  </section>
+
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  'use strict';
+
+  /* ================= 1. 小工具 ================= */
+  var LSKEY = 'pinyin-planet-v1';
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]; }); }
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function num(x){ x=Number(x); return (isFinite(x) && x>0) ? Math.floor(x) : 0; }
+  function show(id){ var s=document.querySelectorAll('.screen'); for(var i=0;i<s.length;i++){ s[i].classList.remove('active'); } var t=$(id); if(t){ t.classList.add('active'); } window.scrollTo(0,0); }
+  var toastTimer=null;
+  function toast(msg){ var t=$('toast'); t.textContent=msg; t.classList.add('show'); if(toastTimer){ clearTimeout(toastTimer); } toastTimer=setTimeout(function(){ t.classList.remove('show'); },2200); }
+
+  /* ================= 2. 本机记录（localStorage） ================= */
+  var storeOK = true;
+  function blank(){
+    return {
+      v:1, total:0, correct:0, beads:0, levels:0, dRound:0,
+      mods:{ A:{n:0,c:0}, B:{n:0,c:0}, C:{n:0,c:0}, D:{n:0,c:0} },
+      wrong:{}, review:[], settings:{ voice:true, motion:false }
+    };
+  }
+  var S = blank();
+  function load(){
+    try{
+      var raw = localStorage.getItem(LSKEY);
+      if(!raw){ return; }
+      var p = JSON.parse(raw);
+      if(!p || typeof p !== 'object'){ return; }
+      S.total=num(p.total); S.correct=num(p.correct); S.beads=num(p.beads); S.levels=num(p.levels);
+      S.dRound = (typeof p.dRound==='number' && p.dRound>=0) ? Math.floor(p.dRound) : 0;
+      ['A','B','C','D'].forEach(function(m){
+        var o = p.mods && p.mods[m];
+        if(o){ S.mods[m] = { n:num(o.n), c:num(o.c) }; }
+      });
+      if(p.wrong && typeof p.wrong==='object'){ S.wrong = p.wrong; }
+      if(Object.prototype.toString.call(p.review)==='[object Array]'){
+        S.review = p.review.filter(function(r){ return r && typeof r.m==='string' && typeof r.i==='number' && r.i>=0; });
+      }
+      if(p.settings){
+        S.settings.voice = (p.settings.voice !== false);
+        S.settings.motion = !!p.settings.motion;
+      }
+    }catch(e){ storeOK = false; }
+  }
+  function save(){
+    try{ localStorage.setItem(LSKEY, JSON.stringify(S)); }
+    catch(e){ storeOK = false; }
+  }
+
+  /* ================= 3. 语音（浏览器合成，仅供参考） ================= */
+  var Speech = (function(){
+    var sup = (typeof window !== 'undefined') && !!window.speechSynthesis && (typeof window.SpeechSynthesisUtterance === 'function');
+    var voices = [], timer = null, bad = 0, heard = false;
+    var watch = null, started = false, onSilent = null, denied = false;
+    function loadVoices(){ try{ voices = window.speechSynthesis.getVoices() || []; }catch(e){ voices = []; } }
+    function pick(){
+      if(!sup){ return null; }
+      var i, l;
+      for(i=0;i<voices.length;i++){ l=String(voices[i].lang||'').toLowerCase().replace('_','-'); if(l.indexOf('zh-cn')===0){ return voices[i]; } }
+      for(i=0;i<voices.length;i++){ l=String(voices[i].lang||'').toLowerCase(); if(l.indexOf('zh')===0){ return voices[i]; } }
+      return null;
+    }
+    if(sup){
+      loadVoices();
+      try{
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        if(window.speechSynthesis.addEventListener){ window.speechSynthesis.addEventListener('voiceschanged', loadVoices); }
+      }catch(e){}
+    }
+    function utter(text, slow){
+      var u = new window.SpeechSynthesisUtterance(String(text));
+      u.lang = 'zh-CN';
+      u.rate = slow ? 0.55 : 0.9;
+      u.pitch = 1.05;
+      u.volume = 1;
+      var v = pick();
+      if(v){ u.voice = v; }
+      started = false;
+      denied = false;
+      u.onstart = function(){ started = true; heard = true; bad = 0; };
+      /* 有的浏览器不发 onstart，只发 onend；两种都算真的念出来了 */
+      u.onend = function(){ started = true; heard = true; bad = 0; };
+      u.onerror = function(ev){
+        var e = ev && ev.error;
+        /* not-allowed = 浏览器在等孩子先点一下（不是设备读不出声），单独记下来 */
+        if(e === 'not-allowed'){ denied = true; return; }
+        if(e && e !== 'interrupted' && e !== 'canceled' && e !== 'aborted'){ bad++; }
+      };
+      if(watch){ clearTimeout(watch); watch = null; }
+      try{ window.speechSynthesis.speak(u); }catch(e){ bad++; return; }
+      /* 看门狗：真引擎一般 0.1~0.3 秒就会发 onstart。2.4 秒还没动静，
+         就认定这一次没有读出声 —— 专门用来对付"浏览器有语音功能、
+         却一点声音也没有"（有的浏览器还会一直说自己正在念）。 */
+      watch = setTimeout(function(){
+        watch = null;
+        if(started){ return; }
+        if(!denied){ bad++; }
+        if(typeof onSilent === 'function'){ try{ onSilent(denied ? 'denied' : 'silent'); }catch(e){} }
+      }, 2400);
+    }
+    function speak(text, slow){
+      if(!sup){ return false; }
+      try{
+        loadVoices();
+        var ss = window.speechSynthesis, busy = !!(ss.speaking || ss.pending);
+        if(ss.paused){ try{ ss.resume(); }catch(e){} }
+        if(busy){ ss.cancel(); }
+        if(timer){ clearTimeout(timer); timer = null; }
+        if(busy){
+          /* iOS Safari：刚 cancel 完马上 speak 常常没有声音，隔一小会儿再说 */
+          timer = setTimeout(function(){ timer = null; try{ utter(text, slow); }catch(e){} }, 90);
+        }else{
+          utter(text, slow);
+        }
+        return true;
+      }catch(e){ return false; }
+    }
+    function stop(){
+      if(timer){ clearTimeout(timer); timer = null; }
+      if(watch){ clearTimeout(watch); watch = null; }
+      if(sup){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+    }
+    /* 连续两次报错、而且一次都没成功发出过声音，才认为这台设备读不出来 */
+    function dead(){ return !sup || (bad >= 2 && !heard); }
+    /* 一次都没念出来过、而且已经开始怀疑读不出声 */
+    function silent(){ return !!sup && !heard && bad >= 1; }
+    return {
+      ok:sup, speak:speak, stop:stop, loadVoices:loadVoices, dead:dead, silent:silent,
+      setSilent:function(fn){ onSilent = fn; }
+    };
+  })();
+
+  /* ================= 3.5 轻量提示音（不需要任何音频文件） ================= */
+  var Sound = (function(){
+    var Ctor = (typeof window !== 'undefined') && (window.AudioContext || window.webkitAudioContext);
+    var ctx = null;
+    function ensure(){
+      if(!Ctor){ return null; }
+      try{
+        if(!ctx){ ctx = new Ctor(); }
+        if(ctx.state === 'suspended' && ctx.resume){ try{ ctx.resume(); }catch(e){} }
+        return ctx;
+      }catch(e){ return null; }
+    }
+    function blip(c, freq, at, dur, vol, type){
+      var o = c.createOscillator(), g = c.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, at);
+      g.gain.setValueAtTime(0.0001, at);
+      g.gain.exponentialRampToValueAtTime(vol, at + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+      o.connect(g); g.connect(c.destination);
+      o.start(at); o.stop(at + dur + 0.03);
+    }
+    function play(kind){
+      if(!Ctor || S.settings.voice === false){ return false; }
+      var c = ensure();
+      if(!c){ return false; }
+      try{
+        var t = c.currentTime + 0.01;
+        if(kind === 'ok'){ blip(c, 660, t, 0.16, 0.10); blip(c, 990, t + 0.10, 0.20, 0.08); }
+        else if(kind === 'bad'){ blip(c, 300, t, 0.26, 0.09, 'triangle'); }
+        else if(kind === 'win'){ blip(c, 660, t, 0.14, 0.10); blip(c, 880, t + 0.10, 0.14, 0.10); blip(c, 1180, t + 0.20, 0.24, 0.09); }
+        else { blip(c, 560, t, 0.07, 0.05, 'triangle'); }
+      }catch(e){ return false; }
+      return true;
+    }
+    function unlock(){ ensure(); }
+    return { play:play, unlock:unlock, ok:!!Ctor };
+  })();
+
+  /* 朗读 + 听不到声音时给孩子和家长一句提醒 */
+  var lastSoundNudge = 0;
+  function soundNudge(msg){
+    var now = Date.now();
+    if(now - lastSoundNudge < 15000){ return; }  /* 不反复打扰 */
+    lastSoundNudge = now;
+    toast(msg);
+  }
+  /* 题目卡里那条"没听到声音"的提示，默认藏着，真的没声音时才露出来 */
+  var soundIssue = null;
+  var WARN_DENIED = '还没听到声音？先点一下「听一遍」按钮，再听一次；也可以让大人读一遍。';
+  var WARN_SILENT = '没听到声音吗？先看看手机侧边的静音键和音量；也可以让大人读一读上面的字，你来选答案。';
+  function warnText(){ return (soundIssue === 'denied') ? WARN_DENIED : WARN_SILENT; }
+  function revealSoundWarn(){
+    var w = $('qSoundWarn');
+    if(w){ w.textContent = warnText(); w.className = 'warnline'; }
+  }
+  /* 点了、也确实叫浏览器念了，可是等了一会儿什么声音都没有 —— 提醒一次 */
+  Speech.setSilent(function(why){
+    soundIssue = why === 'denied' ? 'denied' : 'silent';
+    revealSoundWarn();
+    soundNudge(why === 'denied'
+      ? '还没听到声音？先点一下「听一遍」按钮，再听一次；也可以让大人读一遍'
+      : (Speech.dead()
+        ? '一直没听到朗读声：看看手机侧边的静音键和音量，也可以让大人读一遍'
+        : '没听到声音吗？先看看手机侧边的静音键和音量；也可以让大人读一遍'));
+  });
+  function speakNow(text, slow){
+    /* 开关关着的时候不要偷偷出声，也要把原因说明白，别让孩子以为"点了没反应" */
+    if(S.settings.voice === false){
+      Sound.play('tap');
+      toast('朗读声音关着：点一下上面的「声音」开关就能打开');
+      return false;
+    }
+    if(!Speech.speak(text, slow)){
+      Sound.play('tap');
+      toast('这台设备不能朗读，请大人读一遍');
+      return false;
+    }
+    setTimeout(function(){
+      if(!Speech.dead()){ return; }
+      soundNudge('一直没听到朗读声：看看手机侧边的静音键和音量，也可以让大人读一遍');
+    }, 2700);
+    return true;
+  }
+
+  /* ================= 4. 字形（用 SVG 保证字形一致） ================= */
+  var GLYPH = {
+    b:{ stem:'M34 16 L34 126', bowl:'M34 54 A36 36 0 0 1 34 126' },
+    d:{ stem:'M66 16 L66 126', bowl:'M66 54 A36 36 0 0 0 66 126' },
+    p:{ stem:'M34 54 L34 152', bowl:'M34 54 A36 36 0 0 1 34 126' },
+    q:{ stem:'M66 54 L66 152', bowl:'M66 54 A36 36 0 0 0 66 126' }
+  };
+  function svgLetter(L, h){
+    var g = GLYPH[L];
+    var w = Math.round(h * 104 / 170);
+    return '<svg viewBox="0 0 104 170" width="' + w + '" height="' + h + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="字母 ' + L + '">'
+      + '<path d="' + g.stem + '" fill="none" stroke="#ffb703" stroke-width="16" stroke-linecap="round"/>'
+      + '<path d="' + g.bowl + '" fill="none" stroke="#4cc9f0" stroke-width="16" stroke-linecap="round"/>'
+      + '</svg>';
+  }
+  /* 字母的读音：按《汉语拼音方案》的名称音，用汉字让合成语音读出来 */
+  var SAY = {
+    b:{ ch:'玻', py:'bō' }, p:{ ch:'坡', py:'pō' },
+    d:{ ch:'得', py:'dē' }, q:{ ch:'欺', py:'qī' },
+    n:{ ch:'讷', py:'nē' }, l:{ ch:'勒', py:'lē' }
+  };
+  function sayLetter(L){ return (SAY[L] ? SAY[L].ch : L); }
+  function letterSayTip(L){ return (SAY[L] ? L + ' 读作 ' + SAY[L].py + '（' + SAY[L].ch + '）' : ''); }
+
+  /* ================= 5. 题库 ================= */
+  var MODNAME = { A:'b / d 字母辨认', B:'p / q 字母辨认', C:'n / l 声母辨认', D:'前后鼻音' };
+  var DP = ['an/ang','en/eng','in/ing'];
+  var DPAIR = [['an','ang'],['en','eng'],['in','ing']];
+  var CAT = {
+    A:['b','d'],
+    B:['p','q'],
+    C:[
+      { h:'牛', p:'niú',  i:'n' }, { h:'流', p:'liú',  i:'l' },
+      { h:'南', p:'nán',  i:'n' }, { h:'蓝', p:'lán',  i:'l' },
+      { h:'你', p:'nǐ',   i:'n' }, { h:'里', p:'lǐ',   i:'l' },
+      { h:'奶', p:'nǎi',  i:'n' }, { h:'来', p:'lái',  i:'l' },
+      { h:'暖', p:'nuǎn', i:'n' }, { h:'冷', p:'lěng', i:'l' },
+      { h:'鸟', p:'niǎo', i:'n' }, { h:'六', p:'liù',  i:'l' }
+    ],
+    D:[
+      { g:0, h:'山', p:'shān',  f:'an'  }, { g:0, h:'上', p:'shàng', f:'ang' },
+      { g:0, h:'半', p:'bàn',   f:'an'  }, { g:0, h:'帮', p:'bāng',  f:'ang' },
+      { g:0, h:'三', p:'sān',   f:'an'  }, { g:0, h:'桑', p:'sāng',  f:'ang' },
+      { g:1, h:'真', p:'zhēn',  f:'en'  }, { g:1, h:'争', p:'zhēng', f:'eng' },
+      { g:1, h:'门', p:'mén',   f:'en'  }, { g:1, h:'朋', p:'péng',  f:'eng' },
+      { g:1, h:'分', p:'fēn',   f:'en'  }, { g:1, h:'风', p:'fēng',  f:'eng' },
+      { g:2, h:'林', p:'lín',   f:'in'  }, { g:2, h:'灵', p:'líng',  f:'ing' },
+      { g:2, h:'心', p:'xīn',   f:'in'  }, { g:2, h:'星', p:'xīng',  f:'ing' },
+      { g:2, h:'金', p:'jīn',   f:'in'  }, { g:2, h:'京', p:'jīng',  f:'ing' }
+    ]
+  };
+  var TAILTIP = {
+    'an':'an 是前鼻音：舌尖顶住上牙床，声音在嘴巴前面收住。',
+    'ang':'ang 是后鼻音：舌根抬起来，声音从鼻子后面出来。',
+    'en':'en 是前鼻音：舌尖顶住上牙床，嘴巴放松收住。',
+    'eng':'eng 是后鼻音：舌根抬起来，声音在鼻子后面。',
+    'in':'in 是前鼻音：舌尖顶住上牙床，声音靠前。',
+    'ing':'ing 是后鼻音：舌根抬起来，声音在鼻子后面。'
+  };
+  function glyphTip(L){
+    if(L==='b'){ return 'b 的竖线在左边，半圆在右边。'; }
+    if(L==='d'){ return 'd 的半圆在左边，竖线在右边。'; }
+    if(L==='p'){ return 'p 的竖线向下伸，半圆在右边。'; }
+    return 'q 的半圆在左边，竖线向下伸。';
+  }
+  function handTip(L){
+    if(L==='b'){ return '比一比：左手握拳、大拇指朝上，就像 b。'; }
+    if(L==='d'){ return '比一比：右手握拳、大拇指朝上，就像 d。'; }
+    if(L==='p'){ return '比一比：左手握拳、大拇指朝下，就像 p。'; }
+    return '比一比：右手握拳、大拇指朝下，就像 q。';
+  }
+
+  /* ================= 6. 拼豆作品 ================= */
+  var ART = [
+    { name:'小火箭', rows:['...RR...','..RRRR..','..RYYR..','..RYYR..','.CRRRRC.','..FFFF..'],
+      pal:{ R:'#ff8fa3', Y:'#ffd166', C:'#9be7ff', F:'#ffa94d' } },
+    { name:'小星球', rows:['...PP...','..PPPP..','.PPPPPP.','RRPPPPRR','.PPPPPP.','..PPPP..'],
+      pal:{ P:'#b7a9ee', R:'#ffd166' } },
+    { name:'小星星', rows:['...YY...','..YYYY..','YYYYYYYY','.YYYYYY.','..YYYY..','.YY..YY.'],
+      pal:{ Y:'#ffd166' } }
+  ];
+  var CELLS = ART.map(function(a){
+    var out = [], r, c, ch;
+    for(r=0;r<6;r++){
+      for(c=0;c<8;c++){
+        ch = a.rows[r].charAt(c);
+        if(ch !== '.'){ out.push({ color: a.pal[ch] || '#cccccc' }); }
+      }
+    }
+    return out;
+  });
+  function totalNeed(){ var t=0, i; for(i=0;i<CELLS.length;i++){ t += CELLS[i].length; } return t; }
+  function beadProgress(){
+    var base=0, i;
+    for(i=0;i<CELLS.length;i++){
+      if(S.beads < base + CELLS[i].length){ return { ai:i, lit:S.beads-base, need:CELLS[i].length }; }
+      base += CELLS[i].length;
+    }
+    var last = CELLS.length - 1;
+    return { ai:last, lit:CELLS[last].length, need:CELLS[last].length };
+  }
+  function artGridHTML(ai){
+    var a = ART[ai], cells = CELLS[ai], r, c, ch, bi = 0;
+    var base = 0, k;
+    for(k=0;k<ai;k++){ base += CELLS[k].length; }
+    var lit = clamp(S.beads - base, 0, cells.length);
+    var html = '<div class="beadgrid" role="img" aria-label="' + a.name + ' 拼豆进度 ' + lit + ' / ' + cells.length + ' 颗">';
+    for(r=0;r<6;r++){
+      for(c=0;c<8;c++){
+        ch = a.rows[r].charAt(c);
+        if(ch === '.'){ html += '<span class="void"></span>'; }
+        else{
+          html += '<span style="background:' + (bi < lit ? cells[bi].color : '#e2ddf4') + '"></span>';
+          bi++;
+        }
+      }
+    }
+    html += '</div>';
+    return { html:html, lit:lit, need:cells.length, name:a.name, done:(lit >= cells.length) };
+  }
+
+  /* ================= 7. 题目构造 ================= */
+  function makeQ(m, i){
+    var q = { m:m, i:i, rev:false };
+    if(m === 'A' || m === 'B'){
+      var L = CAT[m][i];
+      q.kind = 'glyph'; q.glyph = L; q.ans = L; q.opts = (m === 'A') ? ['b','d'] : ['p','q'];
+    }else if(m === 'C'){
+      var it = CAT.C[i];
+      q.kind = 'sound'; q.h = it.h; q.p = it.p; q.ans = it.i; q.opts = ['n','l'];
+    }else{
+      var d = CAT.D[i];
+      q.kind = 'tail'; q.h = d.h; q.p = d.p; q.ans = d.f; q.g = d.g; q.opts = DPAIR[d.g].slice();
+    }
+    return q;
+  }
+  function qKey(q){ return q.m + ':' + q.i; }
+  function descOf(m, i){
+    if(m === 'A' || m === 'B'){ return '字母「' + CAT[m][i] + '」的辨认'; }
+    if(m === 'C'){ var it = CAT.C[i]; return it.h + ' ' + it.p + '（声母 ' + it.i + '）'; }
+    var d = CAT.D[i]; return d.h + ' ' + d.p + '（韵母 ' + d.f + '）';
+  }
+  function ansOf(m, i){
+    if(m === 'A' || m === 'B'){ return CAT[m][i]; }
+    if(m === 'C'){ return CAT.C[i].i; }
+    return CAT.D[i].f;
+  }
+  function promptOf(q){
+    if(q.kind === 'glyph'){ return '这个字母是哪一个？'; }
+    if(q.kind === 'sound'){ return '听一听，这个词的声母是哪一个？'; }
+    return '听一听，这个词的韵母是哪一个？';
+  }
+  function sayText(q){ return (q.kind === 'glyph') ? sayLetter(q.glyph) : q.h; }
+
+  /* ================= 8. 出题与关卡 ================= */
+  var L = null;
+  function newQuestions(m, n){
+    var out = [], i, k;
+    if(m === 'A' || m === 'B'){
+      var last = -1;
+      for(i=0;i<n;i++){
+        k = (Math.random() < 0.5) ? 0 : 1;
+        if(k === last){ k = 1 - k; }
+        last = k;
+        out.push(makeQ(m, k));
+      }
+    }else if(m === 'C'){
+      var ids = shuffle([0,1,2,3,4,5,6,7,8,9,10,11]);
+      var nn = [], ll = [];
+      ids.forEach(function(x){ if(CAT.C[x].i === 'n'){ nn.push(x); } else { ll.push(x); } });
+      shuffle(nn.slice(0,3).concat(ll.slice(0,3))).forEach(function(x){ out.push(makeQ('C', x)); });
+    }else{
+      var g = S.dRound % 3, a = [], b = [];
+      for(i=0;i<CAT.D.length;i++){
+        if(CAT.D[i].g === g){ if(CAT.D[i].f === DPAIR[g][0]){ a.push(i); } else { b.push(i); } }
+      }
+      shuffle(a.slice(0,3).concat(b.slice(0,3))).forEach(function(x){ out.push(makeQ('D', x)); });
+    }
+    return out;
+  }
+  function pushReview(q){
+    for(var i=0;i<S.review.length;i++){ if(S.review[i].m === q.m && S.review[i].i === q.i){ return; } }
+    S.review.push({ m:q.m, i:q.i });
+    if(S.review.length > 30){ S.review.shift(); }
+  }
+  function removeReview(q){
+    for(var i=0;i<S.review.length;i++){
+      if(S.review[i].m === q.m && S.review[i].i === q.i){ S.review.splice(i,1); return; }
+    }
+  }
+  function startLevel(m){
+    Speech.stop();
+    var i, qs = [], rv = [];
+    for(i=0;i<S.review.length;i++){ if(S.review[i].m === m){ rv.push(S.review[i]); } }
+    shuffle(rv);
+    rv = rv.slice(0, 2);
+    for(i=0;i<rv.length;i++){ var q0 = makeQ(rv[i].m, rv[i].i); q0.rev = true; qs.push(q0); }
+    var nq = newQuestions(m, 6);
+    for(i=0;i<nq.length;i++){ qs.push(nq[i]); }
+    shuffle(qs);
+    L = { m:m, qs:qs, idx:0, right:0, gained:0, answered:0, reviewCount:rv.length, counts:{}, marks:[], locked:false };
+    for(i=0;i<qs.length;i++){ L.marks.push(''); }
+    $('qTag').textContent = '模块 ' + m + ' · ' + MODNAME[m];
+    show('s-quiz');
+    renderQ();
+  }
+  function renderDots(){
+    var h = '', i, c;
+    for(i=0;i<L.qs.length;i++){
+      c = L.marks[i] || '';
+      h += '<i class="' + c + (i === L.idx ? ' now' : '') + '"></i>';
+    }
+    $('qDots').innerHTML = h;
+  }
+  function renderQ(){
+    var q = L.qs[L.idx];
+    if(!q){ endLevel(); return; }
+    soundIssue = null;   /* 每一题重新判断有没有声音 */
+    L.locked = false;
+    $('qPrompt').textContent = promptOf(q);
+    $('qBeads').textContent = '拼豆 ' + S.beads;
+    $('qFb').className = 'fb';
+    $('qFb').innerHTML = '';
+    $('btnNext').className = 'btn primary hidden';
+    renderDots();
+
+    var st = $('qStage');
+    if(q.kind === 'glyph'){
+      st.innerHTML = '<div class="letterbox">' + svgLetter(q.glyph, 156) + '</div>';
+    }else{
+      st.innerHTML = '<div class="hanzi">' + esc(q.h) + '</div>'
+        + '<div class="mini center">' + (q.kind === 'tail' ? '韵母在这两个里面选：' + esc(q.opts[0]) + ' / ' + esc(q.opts[1]) : '声母在这两个里面选：n / l') + '</div>';
+    }
+
+    var au = $('qAudio');
+    if(q.kind === 'glyph'){
+      au.className = 'audiorow one hidden';
+      au.innerHTML = '';
+    }else if(Speech.ok && S.settings.voice){
+      au.className = 'audiorow';
+      au.innerHTML = '<button class="btn sky sm" id="btnPlay" type="button">听一遍</button>'
+        + '<button class="btn ghost dark sm" id="btnSlow" type="button">慢速再听</button>'
+        + '<div class="warnline hidden" id="qSoundWarn">' + esc(warnText()) + '</div>';
+      $('btnPlay').onclick = function(){ speakNow(sayText(q)); };
+      $('btnSlow').onclick = function(){ speakNow(sayText(q), true); };
+      setTimeout(function(){ if(L && L.qs[L.idx] === q && !L.locked){ Speech.speak(sayText(q)); } }, 280);
+      setTimeout(function(){
+        if(!(L && L.qs[L.idx] === q)){ return; }
+        if(Speech.dead() || Speech.silent()){ revealSoundWarn(); }
+        if(Speech.dead()){ toast('这台设备暂时读不出声音，可以请大人读一遍'); }
+      }, 2700);
+    }else{
+      au.className = 'audiorow one';
+      au.innerHTML = '<div class="warnline">'
+        + (S.settings.voice ? '这台设备的浏览器不能朗读语音。' : '语音朗读已关闭。')
+        + '请让大人读一读这个词，你来选答案，练习照样可以做。</div>';
+    }
+
+    var opts = $('qOpts'), i, html = '';
+    for(i=0;i<q.opts.length;i++){
+      html += '<button class="opt" type="button" data-v="' + esc(q.opts[i]) + '"><span class="lab' + (q.kind === 'glyph' ? '' : ' wide') + '">' + esc(q.opts[i]) + '</span></button>';
+    }
+    opts.innerHTML = html;
+    var bs = opts.querySelectorAll('.opt');
+    for(i=0;i<bs.length;i++){
+      bs[i].onclick = function(){ choose(this.getAttribute('data-v'), this); };
+    }
+  }
+  function renderFeedback(q, right, picked){
+    var fb = $('qFb'), h = '';
+    if(right){
+      h += '<div class="head">答对啦！<span class="beadfx">+1 拼豆</span></div>';
+    }else{
+      h += '<div class="head">再仔细看看这个线索</div>';
+      h += '<div class="mini">你选的是「' + esc(picked) + '」，正确答案是「' + esc(q.ans) + '」。</div>';
+    }
+    if(q.kind === 'glyph'){
+      h += '<div class="reveal">' + esc(q.ans) + '</div>';
+      h += '<div style="display:flex;justify-content:center;margin:2px 0 8px">' + svgLetter(q.ans, 96) + '</div>';
+      h += '<div class="hintline">' + esc(letterSayTip(q.ans)) + '，点下面的按钮就能听。</div>';
+      h += '<div class="hintline">' + esc(glyphTip(q.ans)) + '</div>';
+      h += '<div class="hintline">' + esc(handTip(q.ans)) + '</div>';
+      /* 字母题原本没有语音，现在答完会自动念；万一念不出声，就把提示放在孩子看得到的地方 */
+      h += '<div class="warnline' + (soundIssue ? '' : ' hidden') + '" id="qSoundWarn">' + esc(warnText()) + '</div>';
+    }else if(q.kind === 'sound'){
+      var p = q.p;
+      h += '<div class="reveal"><b>' + esc(p.charAt(0)) + '</b>' + esc(p.slice(1)) + '</div>';
+      h += '<div class="hintline">' + esc(q.h) + ' 的声母是 ' + esc(q.ans) + '。'
+        + (q.ans === 'n' ? 'n 是鼻音：舌尖顶住上牙床，气从鼻子出来。' : 'l 是边音：舌尖顶住上牙床，气从舌头两边出来。') + '</div>';
+    }else{
+      var py = q.p, cut = py.length - q.ans.length;
+      h += '<div class="reveal">' + esc(q.h) + ' <span style="font-size:26px">' + esc(py.slice(0,cut)) + '<b>' + esc(py.slice(cut)) + '</b></span></div>';
+      h += '<div class="hintline">' + esc(q.h) + ' ' + esc(py) + ' 的韵母是 ' + esc(q.ans) + '。' + esc(TAILTIP[q.ans] || '') + '</div>';
+    }
+    if(Speech.ok && S.settings.voice){
+      h += '<div class="mt10"><button class="btn sky sm" id="btnPlay2" type="button">'
+        + (q.kind === 'glyph' ? '听一听 ' + esc(q.ans) + ' 的读音' : '再听一次') + '</button></div>';
+    }
+    if(q.rev){ h += '<div class="mini mt8">这是错题袋里的题，答对了就会把它拿出来。</div>'; }
+    fb.className = 'fb show ' + (right ? 'ok' : 'bad');
+    fb.innerHTML = h;
+    var b2 = $('btnPlay2');
+    if(b2){ b2.onclick = function(){ speakNow(sayText(q)); }; }
+    /* 字母题答完，立刻念一遍这个字母的读音，孩子不用再点一次 */
+    if(b2 && q.kind === 'glyph' && S.settings.voice){ Speech.speak(sayText(q)); }
+  }
+  function choose(v, btn){
+    if(!L || L.locked){ return; }
+    var q = L.qs[L.idx];
+    if(!q){ return; }
+    L.locked = true;
+    var right = (v === q.ans), i, b, bv;
+    var bs = $('qOpts').querySelectorAll('.opt');
+    for(i=0;i<bs.length;i++){
+      b = bs[i]; b.disabled = true;
+      bv = b.getAttribute('data-v');
+      if(bv === q.ans){ b.classList.add('right'); }
+      else if(bv === v){ b.classList.add('wrong'); }
+    }
+    S.total++;
+    S.mods[L.m].n++;
+    L.answered++;
+    if(right){ S.correct++; S.mods[L.m].c++; S.beads++; L.right++; L.gained++; }
+    var k = qKey(q);
+    if(!S.wrong[k]){ S.wrong[k] = { m:q.m, i:q.i, right:0, wrong:0, last:'' }; }
+    var w = S.wrong[k];
+    if(right){ w.right++; } else { w.wrong++; w.last = v; }
+    w.t = Date.now();
+    if(right){ removeReview(q); }
+    else{
+      pushReview(q);
+      if(L.qs.length < 8 && (L.counts[k] || 0) < 1){
+        var pos = Math.min(L.idx + 3, L.qs.length), copy = makeQ(q.m, q.i);
+        copy.rev = true;
+        L.qs.splice(pos, 0, copy);
+        L.marks.splice(pos, 0, '');
+      }
+    }
+    L.counts[k] = (L.counts[k] || 0) + 1;
+    L.marks[L.idx] = right ? 'ok' : 'bad';
+    Sound.play(right ? 'ok' : 'bad');
+    save();
+
+    renderFeedback(q, right, v);
+    renderDots();
+    $('qBeads').textContent = '拼豆 ' + S.beads;
+    $('pillBeads').textContent = '拼豆 ' + S.beads;
+    var nb = $('btnNext');
+    nb.className = 'btn primary';
+    nb.textContent = (L.idx + 1 >= L.qs.length) ? '看本关结果' : '下一题';
+    try{ nb.focus(); }catch(e){}
+  }
+  function nextQ(){
+    if(!L){ return; }
+    Speech.stop();
+    Sound.play('tap');
+    L.idx++;
+    if(L.idx >= L.qs.length){ endLevel(); return; }
+    renderQ();
+  }
+  function endLevel(){
+    Speech.stop();
+    var qs = L.qs.length, right = L.right, gain = L.gained;
+    S.levels++;
+    if(L.m === 'D'){ S.dRound = (S.dRound + 1) % 3; }
+    save();
+    var p = beadProgress(), g = artGridHTML(p.ai), wrongCnt = qs - right;
+    Sound.play(wrongCnt === 0 ? 'win' : 'tap');
+    $('smTitle').textContent = '本关做了 ' + qs + ' 题，答对 ' + right + ' 题';
+    var h = '';
+    h += '<div class="statgrid">'
+      + '<div class="k"><b>' + qs + '</b><span>本关题数</span></div>'
+      + '<div class="k"><b>' + right + '</b><span>本关答对</span></div>'
+      + '<div class="k"><b>+' + gain + '</b><span>本关得到拼豆</span></div>'
+      + '<div class="k"><b>' + S.review.length + '</b><span>错题袋里的题</span></div>'
+      + '</div>';
+    h += '<p style="font-size:17px;font-weight:800;color:' + (wrongCnt === 0 ? '#157a44' : '#4b2f87') + '">'
+      + (wrongCnt === 0 ? '这一关全部答对，真棒！' : '有 ' + wrongCnt + ' 次没答对，没关系，它们已经放进错题袋，下次会先出现一次。')
+      + '</p>';
+    if(L.reviewCount > 0){ h += '<div class="mini">本关里面 ' + L.reviewCount + ' 道是上次的错题。</div>'; }
+    h += '<div class="beadwrap"><div class="beadhead"><span class="nm">拼豆作品：' + ART[p.ai].name + '</span><span class="pg">'
+      + g.lit + ' / ' + g.need + (g.done ? ' · 已完成' : '') + '</span></div>' + g.html + '</div>';
+    h += '<div class="handtip">该休息啦～ 连续练习眼睛会累。站起来动一动，或者看看窗外吧。</div>';
+    $('smBody').innerHTML = h;
+    $('pillBeads').textContent = '拼豆 ' + S.beads;
+    show('s-summary');
+  }
+  /* ================= 9. 教学页 ================= */
+  function teachHTML(m){
+    var h = '';
+    if(m === 'A' || m === 'B'){
+      var L1 = (m === 'A') ? 'b' : 'p', L2 = (m === 'A') ? 'd' : 'q';
+      h += '<div class="compare">'
+        + '<button class="cc" type="button" data-say="' + sayLetter(L1) + '" aria-label="听字母 ' + L1 + ' 的读音">'
+        + '<span class="ccglyph">' + svgLetter(L1, 124) + '</span>'
+        + '<span class="ccname">' + L1 + '<i class="snd">🔊</i></span>'
+        + '<span class="cchint">' + (m === 'A' ? '竖线在左，半圆在右' : '竖线向下伸，半圆在右') + '</span>'
+        + '<span class="ccsay">' + esc(letterSayTip(L1)) + '</span></button>'
+        + '<button class="cc" type="button" data-say="' + sayLetter(L2) + '" aria-label="听字母 ' + L2 + ' 的读音">'
+        + '<span class="ccglyph">' + svgLetter(L2, 124) + '</span>'
+        + '<span class="ccname">' + L2 + '<i class="snd">🔊</i></span>'
+        + '<span class="cchint">' + (m === 'A' ? '半圆在左，竖线在右' : '半圆在左，竖线向下伸') + '</span>'
+        + '<span class="ccsay">' + esc(letterSayTip(L2)) + '</span></button>'
+        + '</div>';
+      h += '<div class="sndhint">点一点字母卡片，就能听到它的读音。</div>';
+      h += '<div class="handtip">' + (m === 'A'
+        ? '手指小口诀：左手握拳、大拇指朝上，就是 b；右手握拳、大拇指朝上，就是 d。'
+        : '手指小口诀：左手握拳、大拇指朝下，就是 p；右手握拳、大拇指朝下，就是 q。') + '</div>';
+      h += '<div class="mini mt8">先看竖线在哪一边，再看半圆在哪一边，一个一个慢慢选就好。一共 6 题。</div>';
+    }else if(m === 'C'){
+      h += '<div class="exlist">'
+        + '<button class="ex" type="button" data-say="牛"><span class="w">牛</span><span class="py">niú · 声母 <b>n</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="流"><span class="w">流</span><span class="py">liú · 声母 <b>l</b><i class="snd">🔊</i></span></button>'
+        + '</div>';
+      h += '<div class="sndhint">点一点，听一听「牛」和「流」。</div>';
+      h += '<div class="handtip">n 是鼻音：舌尖顶住上牙床，气从鼻子出来。<br>l 是边音：舌尖顶住上牙床，气从舌头两边出来。</div>';
+      h += '<div class="mini mt8">先听语音（或者请大人读一遍），再选声母 n 或 l。答题前不会显示拼音，答完才揭晓。一共 6 题。</div>';
+    }else{
+      h += '<div class="exlist">'
+        + '<div class="exrow">'
+        + '<button class="ex" type="button" data-say="山"><span class="w">山</span><span class="py">sh<b>an</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="上"><span class="w">上</span><span class="py">sh<b>ang</b><i class="snd">🔊</i></span></button>'
+        + '</div>'
+        + '<div class="exrow">'
+        + '<button class="ex" type="button" data-say="真"><span class="w">真</span><span class="py">zh<b>en</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="争"><span class="w">争</span><span class="py">zh<b>eng</b><i class="snd">🔊</i></span></button>'
+        + '</div>'
+        + '<div class="exrow">'
+        + '<button class="ex" type="button" data-say="林"><span class="w">林</span><span class="py">l<b>in</b><i class="snd">🔊</i></span></button>'
+        + '<button class="ex" type="button" data-say="灵"><span class="w">灵</span><span class="py">l<b>ing</b><i class="snd">🔊</i></span></button>'
+        + '</div>'
+        + '</div>';
+      h += '<div class="sndhint">点一点，听一听每一组前鼻音和后鼻音的区别。</div>';
+      h += '<div class="handtip">前鼻音 an / en / in：舌尖顶住上牙床，声音在嘴巴前面收住。<br>后鼻音 ang / eng / ing：舌根抬起来，声音从鼻子后面出来。</div>';
+      h += '<div class="mini mt8">先听语音（或者请大人读一遍），再选韵母。这一次会练：<b>' + esc(DP[S.dRound % 3]) + '</b>（三组轮流出现），一共 6 题。</div>';
+    }
+    return h;
+  }
+  function openTeach(m){
+    Speech.stop();
+    $('teachTag').textContent = '模块 ' + m + ' · ' + MODNAME[m];
+    $('teachTitle').textContent = (m === 'A') ? '先认识 b 和 d'
+      : (m === 'B') ? '先认识 p 和 q'
+      : (m === 'C') ? '先分清 n 和 l' : '先分清前鼻音和后鼻音';
+    $('teachBody').innerHTML = teachHTML(m);
+    var tbs = $('teachBody').querySelectorAll('[data-say]'), i;
+    for(i=0;i<tbs.length;i++){
+      tbs[i].onclick = function(){ Sound.play('tap'); speakNow(this.getAttribute('data-say')); };
+    }
+    $('btnTeachStart').setAttribute('data-mod', m);
+    show('s-teach');
+  }
+
+  /* ================= 10. 推荐与首页 ================= */
+  function recommend(){
+    var ms = ['A','B','C','D'], sc = { A:0, B:0, C:0, D:0 }, k, cnt, bm, bc, least;
+    for(k in S.wrong){
+      var w = S.wrong[k];
+      if(w && sc[w.m] != null){ sc[w.m] += num(w.wrong) + num(w.right); }
+    }
+    var best = null, bv = 0;
+    ms.forEach(function(m){ if(sc[m] > bv){ bv = sc[m]; best = m; } });
+    if(best){ return { m:best, why:'这一关孩子遇到的小困难最多，可以先把它练熟。' }; }
+    if(S.review.length > 0){
+      cnt = { A:0, B:0, C:0, D:0 };
+      S.review.forEach(function(r){ if(cnt[r.m] != null){ cnt[r.m]++; } });
+      bm = null; bc = 0;
+      ms.forEach(function(m){ if(cnt[m] > bc){ bc = cnt[m]; bm = m; } });
+      if(bm){ return { m:bm, why:'错题袋里有 ' + S.review.length + ' 道题，下一关会先复习它们。' }; }
+    }
+    least = ms[0];
+    ms.forEach(function(m){ if(S.mods[m].n < S.mods[least].n){ least = m; } });
+    if(S.mods[least].n === 0){ return { m:least, why:'这一关还没练过，从它开始最合适。' }; }
+    return { m:'A', why:'四关都练过了，回到最好玩的 b / d 关热热身吧。' };
+  }
+  function sysNoteHTML(){
+    if(!Speech.ok){ return '这台设备的浏览器不能朗读语音。练习照样可以做：模块 C、D 时会提示让大人读一读字词。'; }
+    if(!S.settings.voice){ return '声音和朗读已关闭。模块 C、D 需要大人读一读字词，其他玩法不受影响。'; }
+    if(Speech.dead()){ return '刚才这台设备没能发出朗读声，可以请大人读一读字词；答对、答错的提示音不受影响。'; }
+    return '语音由浏览器合成，个别字的读音可能不够标准，请以大人的示范为准。';
+  }
+  function renderHome(){
+    $('pillBeads').textContent = '拼豆 ' + S.beads;
+    var p = beadProgress(), rec = recommend();
+    $('homeRec').innerHTML = '推荐今天练：<b>' + esc(MODNAME[rec.m]) + '</b><br>' + esc(rec.why);
+    var bits = [];
+    if(S.total > 0){ bits.push('已经练了 ' + S.total + ' 题，答对 ' + S.correct + ' 题。'); }
+    bits.push('拼豆 ' + S.beads + ' 颗 · ' + ART[p.ai].name + ' ' + p.lit + ' / ' + p.need);
+    if(S.review.length > 0){ bits.push('错题袋里有 ' + S.review.length + ' 道题，下次练习会先出现。'); }
+    if(!storeOK){ bits.push('本机记录暂时存不下来（可能是浏览器的隐私模式），关掉页面后记录会丢失。'); }
+    $('homeStats').innerHTML = bits.join('<br>');
+    $('sysNote').innerHTML = sysNoteHTML();
+  }
+
+  /* ================= 11. 家长记录页 ================= */
+  function renderParent(){
+    var acc = (S.total > 0) ? Math.round(S.correct / S.total * 100) : 0;
+    var h = '';
+    h += '<span class="tag">家长记录</span>';
+    h += '<h2 class="h2">练习情况</h2>';
+    h += '<div class="statgrid">'
+      + '<div class="k"><b>' + S.total + '</b><span>累计练习题数</span></div>'
+      + '<div class="k"><b>' + S.correct + '</b><span>累计答对题数</span></div>'
+      + '<div class="k"><b>' + acc + '%</b><span>累计正确率</span></div>'
+      + '<div class="k"><b>' + S.levels + '</b><span>完成的关卡数</span></div>'
+      + '</div>';
+    h += '<div class="mini">正确率会随练习内容上下浮动，它不是对孩子的评价，只用来了解最近练了什么。</div>';
+
+    h += '<table class="tbl"><tr><th>练习模块</th><th class="num">做题次数</th><th class="num">答对次数</th></tr>';
+    ['A','B','C','D'].forEach(function(m){
+      h += '<tr><td>' + esc(MODNAME[m]) + '</td><td class="num">' + S.mods[m].n + '</td><td class="num">' + S.mods[m].c + '</td></tr>';
+    });
+    h += '</table>';
+
+    var list = [], k;
+    for(k in S.wrong){
+      var w = S.wrong[k];
+      if(w && num(w.wrong) > 0){ list.push({ m:w.m, i:w.i, wrong:num(w.wrong), last:w.last, t:num(w.t) }); }
+    }
+    list.sort(function(a,b){ return (b.wrong - a.wrong) || (b.t - a.t); });
+    h += '<h2 class="h2" style="font-size:18px;margin-top:16px">最近容易混淆的题目</h2>';
+    if(list.length === 0){
+      h += '<div class="mini">还没有需要特别留意的题目。</div>';
+    }else{
+      list.slice(0,5).forEach(function(it){
+        var last = it.last ? ('孩子常选「' + esc(it.last) + '」') : '孩子在这里选错过';
+        h += '<div class="mixrow"><b>' + esc(descOf(it.m, it.i)) + '</b><br>'
+          + last + '，正确答案是「' + esc(ansOf(it.m, it.i)) + '」（做错 ' + it.wrong + ' 次）</div>';
+      });
+    }
+
+    var rec = recommend();
+    h += '<h2 class="h2" style="font-size:18px;margin-top:16px">推荐的下一次练习</h2>';
+    h += '<div class="mixrow" style="background:#eef7ff"><b>' + esc(MODNAME[rec.m]) + '</b><br>' + esc(rec.why) + '</div>';
+    if(S.review.length > 0){
+      h += '<div class="mini mt8">错题袋里现在有 ' + S.review.length + ' 道题，下一关会先出现一次，答对后自动移出。</div>';
+    }
+    if(S.total === 0){ h += '<div class="mini mt8">还没有练习记录，先让孩子玩一关试试吧。</div>'; }
+
+    h += '<h2 class="h2" style="font-size:18px;margin-top:16px">关于声音</h2>';
+    h += '<div class="mini">朗读用的是设备自带的合成语音，不需要联网下载音频。如果一点声音都没有，可以按顺序检查：<br>'
+      + '1. iPhone / iPad 侧面的静音键是不是拨到了静音；<br>'
+      + '2. 手机、电脑的音量，以及首页的「声音与朗读」开关；<br>'
+      + '3. 换用系统自带的 Safari 或 Chrome 打开页面再试一次。<br>'
+      + '真的没有声音也能照常练习：模块 C、D 由大人读一遍字词就好，答对答错还会有提示音。</div>';
+
+    h += '<h2 class="h2" style="font-size:18px;margin-top:16px">记录管理</h2>';
+    h += '<div class="mini">记录只保存在这台设备的浏览器里，不会上传，也不含任何追踪代码。</div>';
+    h += '<button class="btn ghost dark sm mt10" id="btnClear" type="button">清空全部记录</button>';
+    h += '<div id="clearBox"></div>';
+    $('pnBody').innerHTML = h;
+
+    var bc = $('btnClear');
+    if(bc){
+      bc.onclick = function(){
+        $('clearBox').innerHTML = '<div class="confirm"><div style="font-weight:800">确定要清空吗？</div>'
+          + '<div class="mini mt8">题数、答对数、拼豆进度和错题袋都会归零，清空后不能恢复。</div>'
+          + '<div class="grid2 mt10" style="margin-bottom:0">'
+          + '<button class="btn ghost dark sm" id="btnClearNo" type="button">先不清</button>'
+          + '<button class="btn pink sm" id="btnClearYes" type="button">确认清空</button></div></div>';
+        $('btnClearNo').onclick = function(){ $('clearBox').innerHTML = ''; };
+        $('btnClearYes').onclick = clearAll;
+      };
+    }
+  }
+  function clearAll(){
+    S = blank();
+    try{ localStorage.removeItem(LSKEY); }catch(e){}
+    save();
+    renderHome();
+    renderParent();
+    toast('记录已清空');
+  }
+
+  /* ================= 12. 拼豆作品页 ================= */
+  function renderGallery(){
+    var h = '<span class="tag">拼豆作品</span><h2 class="h2">每答对一题，得到一颗拼豆</h2>';
+    h += '<div class="mini">拼豆会从左上到右下，一颗一颗点亮作品。答错不会扣掉已经点亮的拼豆。</div>';
+    ART.forEach(function(a, i){
+      var g = artGridHTML(i);
+      h += '<div class="beadwrap"><div class="beadhead"><span class="nm">' + (i + 1) + '. ' + a.name + '</span>'
+        + '<span class="pg">' + g.lit + ' / ' + g.need + (g.done ? ' <span class="done">已完成</span>' : '') + '</span></div>'
+        + g.html + '</div>';
+    });
+    var all = totalNeed();
+    h += '<div class="bar" style="margin-top:16px"><i style="width:' + Math.round(clamp(S.beads, 0, all) / all * 100) + '%"></i></div>';
+    h += '<div class="mini mt8">现在有 ' + S.beads + ' 颗拼豆 · 三幅作品全部点亮需要 ' + all + ' 颗。</div>';
+    $('galBody').innerHTML = h;
+  }
+
+  /* ================= 13. 设置与绑定 ================= */
+  function applySettings(){
+    document.body.classList.toggle('rm', !!S.settings.motion);
+    $('swVoice').setAttribute('aria-pressed', S.settings.voice ? 'true' : 'false');
+    $('swMotion').setAttribute('aria-pressed', S.settings.motion ? 'true' : 'false');
+  }
+  function goHome(){
+    Speech.stop();
+    L = null;
+    renderHome();
+    show('s-home');
+  }
+  function bind(){
+    var mods = document.querySelectorAll('.mod'), i;
+    for(i=0;i<mods.length;i++){
+      mods[i].onclick = (function(m){ return function(){ openTeach(m); }; })(mods[i].getAttribute('data-mod'));
+    }
+    var homeBtns = document.querySelectorAll('[data-home]');
+    for(i=0;i<homeBtns.length;i++){ homeBtns[i].onclick = goHome; }
+
+    $('btnTeachStart').onclick = function(){ startLevel(this.getAttribute('data-mod')); };
+    $('btnNext').onclick = nextQ;
+    $('btnQuit').onclick = function(){
+      Speech.stop();
+      L = null;
+      renderHome();
+      show('s-home');
+      toast('先休息一下，已经得到的拼豆都留着');
+    };
+    $('btnSmHome').onclick = goHome;
+    $('btnSmAgain').onclick = function(){ startLevel(L ? L.m : 'A'); };
+    $('btnGallery').onclick = function(){ renderGallery(); show('s-gallery'); };
+    $('btnParent').onclick = function(){ renderParent(); show('s-parent'); };
+
+    $('swVoice').onclick = function(){
+      S.settings.voice = !S.settings.voice;
+      Sound.unlock();
+      save();
+      applySettings();
+      Speech.stop();
+      renderHome();
+      if(S.settings.voice){ Sound.play('ok'); speakNow('声音打开了'); toast('声音和朗读已打开'); }
+      else{ toast('声音和朗读已关闭'); }
+    };
+    $('btnTestVoice').onclick = function(){
+      Sound.unlock();
+      /* 家长点这个按钮就是想听一下：如果开关关着，顺手打开并说明白 */
+      if(S.settings.voice === false){
+        S.settings.voice = true;
+        save();
+        applySettings();
+        renderHome();
+        toast('已帮你把声音和朗读打开');
+      }
+      Sound.play('tap');
+      if(!Speech.speak('你好，我是豆豆，我们一起练拼音')){ toast('这台设备不能朗读，可以请大人读一遍'); return; }
+      setTimeout(function(){
+        if(Speech.dead()){ toast('这台设备没有朗读声，可以请大人读一遍'); }
+        else{ toast('刚才念了一句「你好，我是豆豆」，没听到就看看静音键和音量'); }
+      }, 1900);
+    };
+    $('swMotion').onclick = function(){
+      S.settings.motion = !S.settings.motion;
+      save();
+      applySettings();
+      toast(S.settings.motion ? '已减少动画' : '动画已经打开');
+    };
+  }
+
+  /* ================= 14. 启动 ================= */
+  function init(){
+    load();
+    if(!Speech.ok){
+      /* 这台设备读不出朗读，但提示音还能用，所以开关保留给家长控制提示音 */
+      $('swVoice').setAttribute('aria-label', '声音提示音开关');
+    }
+    applySettings();
+    bind();
+    renderHome();
+    var unlock = function(){
+      try{
+        if(window.speechSynthesis && window.speechSynthesis.paused){ window.speechSynthesis.resume(); }
+        Speech.loadVoices();
+      }catch(e){}
+      Sound.unlock();
+    };
+    document.addEventListener('touchend', unlock);
+    document.addEventListener('click', unlock);
+    window.addEventListener('pagehide', function(){ Speech.stop(); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); }
+  else{ init(); }
+})();
+</script>
+</body>
+</html>
